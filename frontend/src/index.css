@@ -8,11 +8,14 @@
   --bodoni-400: 'Bodoni Moda', serif;
   --roboto-400: 'Roboto', sans-serif;
   --off-white: #F5F5F5;
+  --white: #FFFFFF;
   --neon-yellow: #FFFF22;
   --aqua: #23A094;
+  --light-aqua: #2AA38F;
   --tan: #F5F0E0;
   --black: #121212;
   --light-red: #F9706B;
+  --gray: #595959;
 }
 
 * 
@@ -27,4 +30,65 @@
   /* background-blend-mode: lighten; */
   /* background-color: var(--warm-brown); */
   position: relative;
+}
+
+dialog::backdrop
+{
+  position: fixed;
+  z-index: 1;
+  width: 100%;
+  min-height: 100%;
+  left: 0;
+  top: 0;
+  background-color: rgba(0,0,0,0.7);
+}
+
+dialog
+{
+  margin: auto; /* 10% from the top and centered */
+}
+
+/* Hide visually, but still appear in DOM for a11y */
+.aria-invisible 
+{
+  border: 0; 
+  clip: rect(0 0 0 0); 
+  height: 1px;  
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.loadingScreenText {
+  animation-name: loadingScreenText;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-direction: normal;
+  animation-timing-function: linear;
+}
+
+@keyframes loadingScreenText
+{
+  0%
+  { 
+    color: var(--gray);
+  }
+  
+  50%
+  {
+    color: rgb(199, 196, 196);
+  }
+
+  100%
+  {
+    color: var(--gray);
+  }
+}
+
+@media (prefers-reduced-motion) {
+  .loadingScreenText {
+    animation: none;
+  }
 }

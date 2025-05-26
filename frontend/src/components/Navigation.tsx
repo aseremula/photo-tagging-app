@@ -28,7 +28,7 @@ function Navigation({ level="san_francisco" } : { level: string }) {
       {/* TODO: insert time */}
       <div className="flex items-center justify-center gap-2 text-5xl text-(--neon-yellow) bg-(--aqua) p-3">
         <svg className="w-13 h-13 fill-(--neon-yellow) pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M480-132q-64 0-120-24t-98-66q-42-42-66-98t-24-120q0-64 24-120t66-98q42-42 98-66t120-24q64 0 120 24t98 66q42 42 66 98t24 120q0 64-24 120t-66 98q-42 42-98 66t-120 24Zm0-308Zm130 150 20-20-136-136v-194h-28v206l144 144ZM240-810l20 20-130 130-20-20 130-130Zm480 0 130 130-20 20-130-130 20-20ZM480-160q116 0 198-82t82-198q0-116-82-198t-198-82q-116 0-198 82t-82 198q0 116 82 198t198 82Z"/></svg>
-        <p className="font-(family-name:--bodoni-400) italic">0:00</p>
+        <p className="font-(family-name:--bodoni-400) italic">00:00:00</p>
       </div>
         
       <div className="flex flex-col items-end justify-center p-3">

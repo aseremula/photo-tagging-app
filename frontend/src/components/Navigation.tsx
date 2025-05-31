@@ -8,7 +8,7 @@ function Navigation({ level="san_francisco" } : { level: string }) {
     const listItems = [];
     for (let imageCounter = 1; imageCounter <= NUMBER_OF_IMAGES; imageCounter++) {
       listItems.push(
-        <ImageIcon key={imageCounter} imagePath={`/${level}/${imageCounter}.jpg`} markAsFound={false} />
+        <li><ImageIcon key={imageCounter} imagePath={`/${level}/${imageCounter}.jpg`} markAsFound={false} /></li>
       );
     }
     return listItems;

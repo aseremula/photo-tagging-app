@@ -1,7 +1,7 @@
 function ImageIcon({ imagePath="", markAsFound=false } : { imagePath: string, markAsFound: boolean }) {
   
   return (
-    <div className={`w-13 h-13 rounded-sm overflow-hidden flex items-center justify-center ${imagePath==="" && "bg-(--light-red)"}`}>
+    <div className={`min-w-13 min-h-13 max-w-13 max-h-13 rounded-sm overflow-hidden flex items-center justify-center ${imagePath==="" && "bg-(--light-red)"}`}>
     
     {/* If image path exists, show image. Otherwise, show ? */}
     {(imagePath !== "") ?

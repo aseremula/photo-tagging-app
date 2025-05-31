@@ -23,6 +23,15 @@
   box-sizing: border-box;
 }
 
+
+
+/* body
+{
+  min-height: 100vh;
+  background-color: red;
+  overflow-x: hidden;
+} */
+
 .img-test
 {
   background: url('/frontend/public/san_francisco/image.png') no-repeat center;
@@ -91,4 +100,84 @@ dialog
   .loadingScreenText {
     animation: none;
   }
+}
+
+.speech-bubble-bottom {
+	position: relative;
+	background: var(--tan);
+	border-radius: .4em;
+}
+
+.speech-bubble-bottom:after {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	width: 0;
+	height: 0;
+	border: 20px solid transparent;
+	border-top-color: var(--tan);
+	border-bottom: 0;
+	margin-left: -20px;
+	margin-bottom: -20px;
+}
+
+.speech-bubble-top {
+	position: relative;
+	background: var(--tan);
+	border-radius: .4em;
+}
+
+.speech-bubble-top:after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 50%;
+	width: 0;
+	height: 0;
+	border: 20px solid transparent;
+	border-bottom-color: var(--tan);
+	border-top: 0;
+	margin-left: -20px;
+	margin-top: -20px;
+}
+
+.speech-bubble-right {
+	position: absolute;
+	background: var(--tan);
+	border-radius: .4em;
+}
+
+.speech-bubble-right:after {
+	content: '';
+	position: absolute;
+	right: 0;
+	top: 50%;
+	width: 0;
+	height: 0;
+	border: 20px solid transparent;
+	border-left-color: var(--tan);
+	border-right: 0;
+	margin-top: -20px;
+	margin-right: -20px;
+}
+
+.speech-bubble-left {
+	position: absolute;
+	background: var(--tan);
+	border-radius: .4em;
+}
+
+.speech-bubble-left:after {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 50%;
+	width: 0;
+	height: 0;
+	border: 20px solid transparent;
+	border-right-color: var(--tan);
+	border-left: 0;
+	margin-top: -20px;
+	margin-left: -20px;
 }

@@ -8,7 +8,7 @@ function Navigation({ level="san_francisco" } : { level: string }) {
     const listItems = [];
     for (let imageCounter = 1; imageCounter <= NUMBER_OF_IMAGES; imageCounter++) {
       listItems.push(
-        <li><ImageIcon key={imageCounter} imagePath={`/${level}/${imageCounter}.jpg`} markAsFound={false} /></li>
+        <li key={imageCounter}><ImageIcon key={imageCounter} imagePath={`/${level}/${imageCounter}.jpg`} markAsFound={false} /></li>
       );
     }
     return listItems;
@@ -32,7 +32,7 @@ function Navigation({ level="san_francisco" } : { level: string }) {
       </div>
         
       <div className="flex flex-col items-end justify-center p-3">
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center justify-end gap-2 pointer-events-none">
           <img src="/icon.webp" width="65px" height="auto" alt="eBoy's Blockbob Eater"/>
           <h1 className="text-5xl font-(family-name:--bodoni-400) italic text-(--black)">eFIND</h1> 
         </div>

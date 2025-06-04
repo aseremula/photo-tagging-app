@@ -23,8 +23,6 @@
   box-sizing: border-box;
 }
 
-
-
 /* body
 {
   min-height: 100vh;
@@ -32,12 +30,16 @@
   overflow-x: hidden;
 } */
 
-.img-test
+html, body, #app, #app>div {
+  height: 100%;
+}
+
+/* .img-test
 {
   background: url('/frontend/public/san_francisco/image.png') no-repeat center;
   background-size: cover;
   position: relative;
-}
+} */
 
 dialog::backdrop
 {

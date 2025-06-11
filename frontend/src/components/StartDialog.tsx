@@ -90,19 +90,19 @@ function StartDialog() {
     }
 
   return (
-    <dialog ref={startDialogRef} className="min-w-115 max-w-115 font-(family-name:--roboto-400) text-(--black) text-xl bg-(--tan) border-1 border-(--aqua) border-dashed pb-3">
-        <h3 className="font-(family-name:--bodoni-400) italic text-5xl text-(--light-red) p-3 py-6 bg-(--neon-yellow) border-b-(--aqua) border-b-1 border-dashed">Can you find them?</h3>
+    <dialog ref={startDialogRef} className="min-w-115 max-w-115 font-(family-name:--roboto-400) text-(--black) text-xl bg-(--tan) border-1 border-(--aqua) border-dashed pb-3 lg:max-2xl:text-lg">
+        <h3 className="font-(family-name:--bodoni-400) italic text-5xl text-(--light-red) p-3 py-6 bg-(--neon-yellow) border-b-(--aqua) border-b-1 border-dashed lg:max-2xl:text-4xl">Can you find them?</h3>
         <p className="p-3">Can you find all 5 people scattered throughout eBoy's <span className="text-(--aqua) font-bold">San Francisco</span> pixorama? Find them fast enough and you may even appear on the leaderboard!</p>
 
         <form className="flex flex-col gap-1 p-3" id="nameForm" action="" method="POST" onSubmit={e => {
             e.preventDefault();
             handleStartForm(e);
         }}>
-            <legend className="font-bold text-lg text-(--gray)">Enter your name to begin:</legend>
+            <legend className="font-bold text-lg text-(--gray) lg:max-2xl:text-md">Enter your name to begin:</legend>
             <div className="flex items-centerm gap-2">
                 <div>
                     <label className="aria-invisible" htmlFor="name">Name</label>
-                    <input className={`w-[100%] font-(family-name:--roboto-400) text-xl bg-(--off-white) p-3 border-2 rounded-lg ${(Object.keys(formErrors.name).length !== 0) ? "border-(--light-red)" : "border-(--black)"}`} autoFocus={true} id="name" type="text" name="name" placeholder="John Doe" value={formData.name} onChange={(e) => {
+                    <input className={`w-[100%] font-(family-name:--roboto-400) text-xl bg-(--off-white) p-3 border-2 rounded-lg ${(Object.keys(formErrors.name).length !== 0) ? "border-(--light-red)" : "border-(--black)"} lg:max-2xl:text-lg`} autoFocus={true} id="name" type="text" name="name" placeholder="John Doe" value={formData.name} onChange={(e) => {
                         setFormData({...formData, name: e.target.value}); 
                     }}/>
 
@@ -111,7 +111,7 @@ function StartDialog() {
                     </div>    
                 </div>
 
-                <button className="flex gap-1 items-center justify-center font-(family-name:--bodoni-400) italic text-2xl bg-(--aqua) text-(--neon-yellow) cursor-pointer p-3 hover:bg-(--light-aqua)" type="submit">
+                <button className="flex gap-1 items-center justify-center font-(family-name:--bodoni-400) italic text-2xl bg-(--aqua) text-(--neon-yellow) cursor-pointer p-3 hover:bg-(--light-aqua) lg:max-2xl:text-xl" type="submit">
                     <p>Start</p>
                     <svg className="w-7 h-7 fill-(--neon-yellow) pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M694-466H212v-28h482L460-728l20-20 268 268-268 268-20-20 234-234Z"/></svg>
                 </button>

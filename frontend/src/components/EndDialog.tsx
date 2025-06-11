@@ -52,8 +52,8 @@ function EndDialog({ scoreData } : { scoreData: object }) {
     }, []);
 
   return (
-    <dialog ref={endDialogRef} className="min-w-115 max-w-115 font-(family-name:--roboto-400) text-(--black) text-xl bg-(--tan) border-1 border-(--aqua) border-dashed">
-        <h3 className="font-(family-name:--bodoni-400) italic text-5xl text-(--light-red) p-3 py-6 bg-(--neon-yellow) border-b-(--aqua) border-b-1 border-dashed">Results</h3>
+    <dialog ref={endDialogRef} className="min-w-115 max-w-115 font-(family-name:--roboto-400) text-(--black) text-xl bg-(--tan) border-1 border-(--aqua) border-dashed lg:max-2xl:text-lg">
+        <h3 className="font-(family-name:--bodoni-400) italic text-5xl text-(--light-red) p-3 py-6 bg-(--neon-yellow) border-b-(--aqua) border-b-1 border-dashed lg:max-2xl:text-4xl">Results</h3>
        
        {(isLoading) ? 
         <div className="p-3 text-center">
@@ -62,7 +62,7 @@ function EndDialog({ scoreData } : { scoreData: object }) {
        :
         ((error || Object.keys(leaderboardInfo).length == 0) ?
             <div className="p-3 text-center">
-                <p className="text-3xl">⚠️ ✋ 🤔</p>
+                <p className="text-3xl lg:max-2xl:text-2xl">⚠️ ✋ 🤔</p>
                 <p>There was an error grabbing the leaderboard.</p>
             </div>
         :
@@ -113,7 +113,7 @@ function EndDialog({ scoreData } : { scoreData: object }) {
         </div>
 
         {/* TODO: send user back to StartDialog upon clicking */}
-        <button className="flex gap-1 items-center justify-center font-(family-name:--bodoni-400) italic text-2xl bg-(--aqua) text-(--neon-yellow) cursor-pointer p-3 hover:bg-(--light-aqua) w-[100%]" type="submit">
+        <button className="flex gap-1 items-center justify-center font-(family-name:--bodoni-400) italic text-2xl bg-(--aqua) text-(--neon-yellow) cursor-pointer p-3 hover:bg-(--light-aqua) w-[100%] lg:max-2xl:text-xl" type="submit">
             <p>Play Again</p>
             <svg className="w-7 h-7 fill-(--neon-yellow) pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M694-466H212v-28h482L460-728l20-20 268 268-268 268-20-20 234-234Z"/></svg>
         </button>

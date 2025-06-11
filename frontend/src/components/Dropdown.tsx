@@ -18,6 +18,7 @@ function Dropdown({ level="san_francisco", imageSet, bubbleDirection, setShowDro
     setGuessedImage({...guessedImage, imagePosition: imagePosition, result: "correct"}); // TODO: remove when satisfied with UI - this is a temp. replacement for calling API
     
     // When clicking an image, clear initial timeout to close dropdown and reset it to a new time after user's guess has been submitted. This feature is for touchscreens; as the user will not be able to close the dropdown by mousing out of it, closing the dropdown after a set amount of time prevents it from hiding part of the image that may have what the user is searching for
+
     // TODO: move below code so it appears after the user's guess is sent to the API and deems it correct/incorrect
     clearTimeout(dropdownTimeoutRef.current);
     dropdownTimeoutRef.current = setTimeout(() => {
@@ -32,11 +33,13 @@ function Dropdown({ level="san_francisco", imageSet, bubbleDirection, setShowDro
     for (let imageCounter = 1; imageCounter <= NUMBER_OF_IMAGES; imageCounter++) {
       if(!imageSet.has(imageCounter)) {
         listItems.push(
-          <li key={imageCounter}>
+          <li key={imageCounter} className="flex items-center justify-center">
             {/* TODO: On click, check with API if coordinates are correct */}
             <button type="button" className={`cursor-${(guessedImage.result === "correct") ? "default" : "pointer"} relative ${(guessedImage.imagePosition === 0 || guessedImage.imagePosition === imageCounter || guessedImage.result !== "waiting") ? "opacity-100" : "opacity-50"}`} onMouseEnter={() => (setGuessedImage({...guessedImage, imagePosition: imageCounter as ImagePosition, result: "waiting"}))} onClick={(e) => handleClick(e, imageCounter as ImagePosition)} disabled={(guessedImage.result === "correct") ? true : false} aria-label={`Guess image ${imageCounter} is located here`}>
-              {(guessedImage.imagePosition === imageCounter && guessedImage.result === "correct") && <svg className="svgEnter z-1 absolute left-1 top-1.5 w-10 h-10 fill-(--light-red) pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M382-208 122-468l90-90 170 170 366-366 90 90-456 456Z"/></svg>}
-              {(guessedImage.imagePosition === imageCounter && guessedImage.result === "incorrect") && <svg className="svgEnter z-1 absolute left-1 top-1.5 w-10 h-10 fill-(--light-red) pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="m256-168-88-88 224-224-224-224 88-88 224 224 224-224 88 88-224 224 224 224-88 88-224-224-224 224Z"/></svg>}
+              {(guessedImage.imagePosition === imageCounter && guessedImage.result === "correct") && <svg className="svgEnter z-1 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 fill-(--light-red) pointer-events-none lg:max-2xl:w-6 lg:max-2xl:h-6 xl:max-2xl:w-8 xl:max-2xl:h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M382-208 122-468l90-90 170 170 366-366 90 90-456 456Z"/></svg>}
+
+              {(guessedImage.imagePosition === imageCounter && guessedImage.result === "incorrect") && <svg className="svgEnter z-1 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 fill-(--light-red) pointer-events-none lg:max-xl:w-6 lg:max-xl:h-6 xl:max-2xl:w-8 xl:max-2xl:h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="m256-168-88-88 224-224-224-224 88-88 224 224 224-224 88 88-224 224 224 224-88 88-224-224-224 224Z"/></svg>}
+
               {/* For a11y, show in DOM if the user's guess is correct, incorrect, or waiting to be checked */}
               {(guessedImage.imagePosition === imageCounter) && <p className="aria-invisible">{guessedImage.result}</p>}
 
@@ -52,8 +55,8 @@ function Dropdown({ level="san_francisco", imageSet, bubbleDirection, setShowDro
   };
 
   return (
-    <section className={`speech-bubble-${bubbleDirection}`} onMouseLeave={() => (guessedImage.result === "waiting" && setShowDropdown(false))}>
-      <ul className="flex items-center justify-center gap-5 p-3">
+    <section className={`lg:max-xl:w-[35vw] xl:max-2xl:w-[31vw] speech-bubble-${bubbleDirection}`} onMouseLeave={() => (guessedImage.result === "waiting" && setShowDropdown(false))}>
+      <ul className={`p-3 grid gap-5 grid-cols-[repeat(5,52px)] lg:max-2xl:gap-[5%] lg:max-2xl:grid-cols-[repeat(auto-fit,minmax(27px,1fr))] lg:max-2xl:p-2`}>
         {renderList()}
       </ul>
     </section>

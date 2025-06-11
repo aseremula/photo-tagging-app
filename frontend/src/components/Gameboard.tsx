@@ -22,18 +22,18 @@ function Gameboard({ level="san_francisco" } : { level: string }) {
 
   function getClickCoords(event: MouseEvent<HTMLElement>)
   {
-    // from: https://stackoverflow.com/a/29296049/14198287
-    // to standardize coordinates across different screen sizes, convert the x and y offset of the click relative to the image frame to percentages based on the height and width of the image as displayed
+    // From: https://stackoverflow.com/a/29296049/14198287
+    // To standardize coordinates across different screen sizes, convert the x and y offset of the click relative to the image frame to percentages based on the height and width of the image as displayed
     const e = event.target as HTMLElement;
     const { width, height } = e.getBoundingClientRect(); // get the height and width of the image as it appears on the user's screen
     const { offsetX, offsetY } = event.nativeEvent; // get the offset of the click relative to the image element directly
     
-    // map the coordinates on a 10,000px x 10,000px image. Include the offset numbers so the dropdown can appear exactly where the user clicked (as these numbers can be different for each screen size)
+    // Map the coordinates on a 10,000px x 10,000px image. Include the offset numbers so the dropdown can appear exactly where the user clicked (as these numbers can be different for each screen size)
     const x = Math.round((offsetX / width) * 10000); 
     const y = Math.round((offsetY / height) * 10000);
     if(coordinates.standardX === x && coordinates.standardY === y)
     {
-      // if the user clicks an area previously clicked, toggle the dropdown accordingly
+      // If the user clicks an area previously clicked, toggle the dropdown accordingly
       setShowDropdown(!showDropdown);
     }
     else 
@@ -42,15 +42,17 @@ function Gameboard({ level="san_francisco" } : { level: string }) {
       setCoordinates({...coordinates, pageX: offsetX, pageY: offsetY, standardX: x, standardY: y});
 
       // Determine how to display dropdown based on where the user clicked the image. The dropdown's triangle should appear right next to the mouse cursor at all times
-      if(x >= 8500)
+      // Left and right dropdowns activate when the user clicks on the first or last (respectively) 25% of the image
+      if(offsetX >= (width - (width*0.25)))
       {
-        // Images show on the left when too close to the right edge, ex. [ ]>
-        setDropdownCoordinates({...dropdownCoordinates, top: -35, left: -385, bubbleDirection: "right"});
+        // Images show on the left when too close to the right edge, ex. [ ]>        
+        // Since the width of the dropdown is not known until the user clicks, and the dropdown changes size based on the user's screen width, use a slope-intercept function given from a linear regression that uses the width of the user's device as X to position this dropdown. If the images/buttons inside are max-height/width, that means the dropdown is a constant size regardless of screen width and a concrete number for left can be given
+        setDropdownCoordinates({...dropdownCoordinates, top: -35, left: ((window.innerWidth < 1200) ? ((-0.2722*window.innerWidth) - 78.75) : -398), bubbleDirection: "right"});
       }
-      else if(x <= 1150)
+      else if(offsetX <= (width*0.25))
       {
         // Images show on the right when too close to the left edge, ex. <[ ]
-        setDropdownCoordinates({...dropdownCoordinates, top: -35, left: 30, bubbleDirection: "left"});
+        setDropdownCoordinates({...dropdownCoordinates, top: -40, left: 35, bubbleDirection: "left"});
       }
       else if(y <= 1500)
       {
@@ -60,9 +62,9 @@ function Gameboard({ level="san_francisco" } : { level: string }) {
       else
       {
         // Images show on the top when too close to the bottom edge, ex. v[ ]
-        setDropdownCoordinates({...dropdownCoordinates, top: -65, left: 2, bubbleDirection: "bottom"})
+        setDropdownCoordinates({...dropdownCoordinates, top: -75, left: 0, bubbleDirection: "bottom"})
       }
-  }
+    }
   };
 
   function handleClick(e: MouseEvent<HTMLElement>)
@@ -78,7 +80,7 @@ function Gameboard({ level="san_francisco" } : { level: string }) {
   }
 
   return (
-    <main className="p-5 bg-(--off-white) border-2 flex flex-col justify-center gap-5">
+    <main className="p-5 bg-(--off-white) flex flex-col justify-center gap-5">
       <Navigation level={level}/>
 
       <div className="relative self-center">
@@ -102,7 +104,7 @@ function Gameboard({ level="san_francisco" } : { level: string }) {
       </div>
 
       <StartDialog />
-      {/* <EndDialog /> */}  
+      <EndDialog />  
     </main>
   )
 }

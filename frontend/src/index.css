@@ -23,6 +23,21 @@
   box-sizing: border-box;
 }
 
+@theme {
+  /* 528px */
+  /* --breakpoint-lg: 33rem;  */
+
+  /* 592 px */
+  --breakpoint-lg: 37rem; 
+  /* 800px */
+  --breakpoint-xl: 50rem; 
+
+  /* 1200px */
+  --breakpoint-2xl: 75rem;
+  /* --breakpoint-3xl: 120rem; */
+}
+
+
 /* body
 {
   min-height: 100vh;

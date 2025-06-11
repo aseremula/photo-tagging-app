@@ -6,7 +6,7 @@ import Gameboard from "./components/Gameboard"
 type DeviceCompatibility = "compatible" | "rotate" | "incompatible" | "unknown" | "loading";
 
 function App() {
-  const WIDTH_BREAKPOINT = 600; // only support responsive design for devices with this screen width in pixels or higher due to using such a wide/detailed image
+  const WIDTH_BREAKPOINT = 592; // only support responsive design for devices with this screen width in pixels or higher due to using such a wide/detailed image
   const [compatibility, setCompatibility] = useState<DeviceCompatibility>("loading");
  
   useEffect(() => {

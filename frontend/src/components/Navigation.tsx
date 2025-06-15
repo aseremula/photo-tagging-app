@@ -1,14 +1,16 @@
-// import { useState } from 'react'
+import { useContext } from 'react'
 import ImageIcon from './ImageIcon';
+import { LevelContext } from '../context/levelContext';
 
-function Navigation({ level="san_francisco" } : { level: string }) {
+function Navigation() {
+  const level = useContext(LevelContext);
 
   const NUMBER_OF_IMAGES = 5;
   const renderList = () => {
     const listItems = [];
     for (let imageCounter = 1; imageCounter <= NUMBER_OF_IMAGES; imageCounter++) {
       listItems.push(
-        <li key={imageCounter}><ImageIcon key={imageCounter} imagePath={`/${level}/${imageCounter}.jpg`} markAsFound={false} /></li>
+        <li key={imageCounter}><ImageIcon key={imageCounter} imagePath={`/${level.img}/${imageCounter}.jpg`} markAsFound={false} /></li>
       );
     }
     return listItems;
@@ -39,7 +41,7 @@ function Navigation({ level="san_francisco" } : { level: string }) {
           <h1 className="text-5xl font-(family-name:--bodoni-400) italic text-(--black) lg:max-2xl:text-3xl">eFIND</h1> 
         </div>
             
-        <h2 className="text-lg lg:max-2xl:text-sm"><a href="https://www.eboy.com/products/san-francisco-poster">San Francisco</a></h2>
+        <h2 className="text-lg lg:max-2xl:text-sm"><a href="https://www.eboy.com/products/san-francisco-poster">{level.title}</a></h2>
       </div>
     </nav>
   )

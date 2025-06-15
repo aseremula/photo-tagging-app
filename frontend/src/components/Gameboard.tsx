@@ -1,9 +1,10 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useContext } from 'react';
 import type { MouseEvent } from 'react';
-import Navigation from './Navigation'
-import StartDialog from './StartDialog'
-import EndDialog from './EndDialog'
-import Dropdown from './Dropdown'
+import Navigation from './Navigation';
+import StartDialog from './StartDialog';
+import EndDialog from './EndDialog';
+import Dropdown from './Dropdown';
+import { LevelContext } from '../context/levelContext';
 
 type BubbleDirection = "top" | "bottom" | "left" | "right";
 interface dropdownCoordinatesState {
@@ -12,13 +13,14 @@ interface dropdownCoordinatesState {
   bubbleDirection: BubbleDirection;
 }
 
-function Gameboard({ level="san_francisco" } : { level: string }) {
+function Gameboard() {
   const [imageSet, setImageSet] = useState(() => new Set([]));
   const [showDropdown, setShowDropdown] = useState(false);
   const [showImage, seShowImage] = useState(true);
   const [dropdownCoordinates, setDropdownCoordinates] = useState<dropdownCoordinatesState>({ top: -65, left: 2, bubbleDirection: "bottom" });
   const [coordinates, setCoordinates] = useState({ pageX: 0, pageY: 0, standardX: 0, standardY: 0 });
   const dropdownTimeoutRef = useRef(0);
+  const level = useContext(LevelContext);
 
   function getClickCoords(event: MouseEvent<HTMLElement>)
   {
@@ -81,7 +83,7 @@ function Gameboard({ level="san_francisco" } : { level: string }) {
 
   return (
     <main className="p-5 bg-(--off-white) flex flex-col justify-center gap-5">
-      <Navigation level={level}/>
+      <Navigation/>
 
       <div className="relative self-center">
         <span style={{
@@ -94,12 +96,12 @@ function Gameboard({ level="san_francisco" } : { level: string }) {
           {(showDropdown) && <span className="appear" key={`${coordinates.standardX}-${coordinates.standardY}`} onMouseEnter={() => {
           setShowDropdown(true);
           clearTimeout(dropdownTimeoutRef.current); // do not close the dropdown while the user's mouse moves around the component
-          }}><Dropdown level="san_francisco" imageSet={imageSet} bubbleDirection={dropdownCoordinates.bubbleDirection} setShowDropdown={setShowDropdown} dropdownTimeoutRef={dropdownTimeoutRef}/></span>}
+          }}><Dropdown imageSet={imageSet} bubbleDirection={dropdownCoordinates.bubbleDirection} setShowDropdown={setShowDropdown} dropdownTimeoutRef={dropdownTimeoutRef}/></span>}
         </span>
 
         <div onClick={(e) => handleClick(e)} onMouseLeave={() => setShowDropdown(false)} className="hover:cursor-crosshair">
           {/* Add blur to image before game begins to prevent users from searching for images before starting the timer (cheating) */}
-          <img className={`pointer-events-none ${(!showImage) && "blur-sm grayscale"}`} src={`/${level}/image.png`} width="auto" height="auto" alt="A pixorama of San Francisco by eBoy"/>
+          <img className={`pointer-events-none ${(!showImage) && "blur-sm grayscale"}`} src={`/${level.img}/image.png`} width="auto" height="auto" alt={`A pixorama of ${level.title} by eBoy`}/>
         </div>
       </div>
 

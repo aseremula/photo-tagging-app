@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import type { RefObject, Dispatch, SetStateAction, MouseEvent } from 'react';
 import ImageIcon from "./ImageIcon";
+import { LevelContext } from '../context/levelContext';
 
 type GuessResult = "correct" | "incorrect" | "waiting";
 type ImagePosition = 0 | 1 | 2 | 3 | 4 | 5;
@@ -9,8 +10,9 @@ interface guessedImageState {
   result: GuessResult;
 }
 
-function Dropdown({ level="san_francisco", imageSet, bubbleDirection, setShowDropdown, dropdownTimeoutRef } : { level: string, imageSet: Set<number>, bubbleDirection: "left" | "right" | "bottom" | "top",  setShowDropdown: Dispatch<SetStateAction<boolean>>, dropdownTimeoutRef: RefObject<ReturnType<typeof setTimeout>>}) {
+function Dropdown({imageSet, bubbleDirection, setShowDropdown, dropdownTimeoutRef } : { imageSet: Set<number>, bubbleDirection: "left" | "right" | "bottom" | "top",  setShowDropdown: Dispatch<SetStateAction<boolean>>, dropdownTimeoutRef: RefObject<ReturnType<typeof setTimeout>>}) {
   const [guessedImage, setGuessedImage] = useState<guessedImageState>({imagePosition: 0, result: "waiting"});
+  const level = useContext(LevelContext);
 
   function handleClick(e: MouseEvent<HTMLElement>, imagePosition: ImagePosition)
   {
@@ -44,7 +46,7 @@ function Dropdown({ level="san_francisco", imageSet, bubbleDirection, setShowDro
               {(guessedImage.imagePosition === imageCounter) && <p className="aria-invisible">{guessedImage.result}</p>}
 
               <span className={`pointer-events-none ${(guessedImage.imagePosition === imageCounter && guessedImage.result !== "waiting") && "grayscale opacity-20"}`}>
-                <ImageIcon key={imageCounter} imagePath={`/${level}/${imageCounter}.jpg`} markAsFound={false} />
+                <ImageIcon key={imageCounter} imagePath={`/${level.img}/${imageCounter}.jpg`} markAsFound={false} />
               </span>
             </button>
           </li>

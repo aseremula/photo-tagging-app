@@ -1,14 +1,15 @@
-import { useState, useEffect } from 'react'
-// import './App.css'
-import Navigation from "./components/Navigation"
-import Gameboard from "./components/Gameboard"
+import { useState, useEffect } from 'react';
+import Gameboard from "./components/Gameboard";
+import { LevelContext } from './context/levelContext';
+import type { LevelContextType } from './context/levelContext';
 
 type DeviceCompatibility = "compatible" | "rotate" | "incompatible" | "unknown" | "loading";
 
 function App() {
   const WIDTH_BREAKPOINT = 592; // only support responsive design for devices with this screen width in pixels or higher due to using such a wide/detailed image
   const [compatibility, setCompatibility] = useState<DeviceCompatibility>("loading");
- 
+  const [level, setLevel] = useState<LevelContextType>({ img: "san_francisco", title: "San Francisco" });
+
   useEffect(() => {
     isDeviceCompatible(); // for initial load of app
     window.addEventListener("resize", isDeviceCompatible);
@@ -37,9 +38,11 @@ function App() {
   }
 
   return (
-    <div className="">
+    <div>
       {(compatibility === "compatible") ? 
-        <Gameboard level={"san_francisco"}/>
+        <LevelContext.Provider value={level}>
+          <Gameboard/>
+        </LevelContext.Provider>
         :
         <div className="bg-(--off-white) min-h-[100vh] flex flex-col gap-4 justify-start font-(family-name:--roboto-400) text-base">
           <div className="bg-(--tan) p-5 flex items-center justify-end gap-2 pointer-events-none border-b-(--aqua) border-b-1 border-dashed">

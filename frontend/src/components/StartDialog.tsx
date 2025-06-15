@@ -1,6 +1,8 @@
-import { useState, useRef, type FormEvent } from 'react'
+import { useState, useContext, useRef, type FormEvent } from 'react';
+import { LevelContext } from '../context/levelContext';
 
 function StartDialog() {
+    const level = useContext(LevelContext);
     // TODO: ensure dialog cannot be closed
     const startDialogRef = useRef<HTMLDialogElement>(null);
     // startDialogRef.current?.showModal();
@@ -92,7 +94,7 @@ function StartDialog() {
   return (
     <dialog ref={startDialogRef} className="min-w-115 max-w-115 font-(family-name:--roboto-400) text-(--black) text-xl bg-(--tan) border-1 border-(--aqua) border-dashed pb-3 lg:max-2xl:text-lg">
         <h3 className="font-(family-name:--bodoni-400) italic text-5xl text-(--light-red) p-3 py-6 bg-(--neon-yellow) border-b-(--aqua) border-b-1 border-dashed lg:max-2xl:text-4xl">Can you find them?</h3>
-        <p className="p-3">Can you find all 5 people scattered throughout eBoy's <span className="text-(--aqua) font-bold">San Francisco</span> pixorama? Find them fast enough and you may even appear on the leaderboard!</p>
+        <p className="p-3">Can you find all 5 people scattered throughout eBoy's <span className="text-(--aqua) font-bold">{level.title}</span> pixorama? Find them fast enough and you may even appear on the leaderboard!</p>
 
         <form className="flex flex-col gap-1 p-3" id="nameForm" action="" method="POST" onSubmit={e => {
             e.preventDefault();

@@ -5,7 +5,7 @@ function ImageIcon({ imagePath="", markAsFound=false } : { imagePath: string, ma
     {/* If image path exists, show image. Otherwise, show ? */}
     {(imagePath !== "") ?
       <>
-        <img className={`relative ${(markAsFound) && "grayscale opacity-20"}`} src={imagePath} width="100%" height="auto" alt="A snippet from eBoy's San Francisco Pixorama"/>
+        <img className={`relative ${(markAsFound) && "grayscale opacity-20"}`} src={imagePath} width="100%" height="auto" alt="A person from eBoy's pixorama"/>
         {(markAsFound) && <svg className="absolute w-10 h-10 fill-(--light-red) pointer-events-none lg:max-2xl:w-6 lg:max-2xl:h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M382-208 122-468l90-90 170 170 366-366 90 90-456 456Z"/></svg>}
       </>
       :

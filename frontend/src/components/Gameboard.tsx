@@ -1,12 +1,13 @@
 import { useState, useRef, useContext } from 'react';
 import type { MouseEvent } from 'react';
 import Navigation from './Navigation';
-import StartDialog from './StartDialog';
-import EndDialog from './EndDialog';
+import StartMenu from './StartMenu';
+import EndMenu from './EndMenu';
 import Dropdown from './Dropdown';
 import { LevelContext } from '../context/levelContext';
 
 type BubbleDirection = "top" | "bottom" | "left" | "right";
+type playStates = "start_menu" | "gameboard_guessing" | "end_menu";
 interface dropdownCoordinatesState {
   top: number;
   left: number;
@@ -15,8 +16,8 @@ interface dropdownCoordinatesState {
 
 function Gameboard() {
   const [imageSet, setImageSet] = useState(() => new Set([]));
+  const [playState, setPlayState] = useState<playStates>("end_menu");
   const [showDropdown, setShowDropdown] = useState(false);
-  const [showImage, seShowImage] = useState(true);
   const [dropdownCoordinates, setDropdownCoordinates] = useState<dropdownCoordinatesState>({ top: -65, left: 2, bubbleDirection: "bottom" });
   const [coordinates, setCoordinates] = useState({ pageX: 0, pageY: 0, standardX: 0, standardY: 0 });
   const dropdownTimeoutRef = useRef(0);
@@ -82,31 +83,37 @@ function Gameboard() {
   }
 
   return (
-    <main className="p-5 bg-(--off-white) flex flex-col justify-center gap-5">
-      <Navigation/>
-
-      <div className="relative self-center">
-        <span style={{
-        position: "absolute",
-        left: coordinates.pageX + dropdownCoordinates.left,
-        top: coordinates.pageY + dropdownCoordinates.top,
-        transform: "translateX(-50%) translateY(-50%)",
-        }}>
-          {/* The key is only used for refreshing the dropdown on touchscreens - if the user guesses correctly and clicks other spots of the image immediately, return the dropdown to its inital state */}
-          {(showDropdown) && <span className="appear" key={`${coordinates.standardX}-${coordinates.standardY}`} onMouseEnter={() => {
-          setShowDropdown(true);
-          clearTimeout(dropdownTimeoutRef.current); // do not close the dropdown while the user's mouse moves around the component
-          }}><Dropdown imageSet={imageSet} bubbleDirection={dropdownCoordinates.bubbleDirection} setShowDropdown={setShowDropdown} dropdownTimeoutRef={dropdownTimeoutRef}/></span>}
-        </span>
-
-        <div onClick={(e) => handleClick(e)} onMouseLeave={() => setShowDropdown(false)} className="hover:cursor-crosshair">
-          {/* Add blur to image before game begins to prevent users from searching for images before starting the timer (cheating) */}
-          <img className={`pointer-events-none ${(!showImage) && "blur-sm grayscale"}`} src={`/${level.img}/image.png`} width="auto" height="auto" alt={`A pixorama of ${level.title} by eBoy`}/>
+    <main className="relative">
+      {/* When either menu is open, gameboard does not accept clicks. However, the navigation still does! */}
+      {(playState === "start_menu" || playState === "end_menu") && 
+        <div className="z-1 fixed bg-black/50 min-h-[100%] w-[100%] flex items-center justify-center">
+          {(playState === "start_menu") ? <StartMenu /> : <EndMenu />}
         </div>
-      </div>
+      }
+ 
+      <section className="p-5 bg-(--off-white) flex flex-col justify-center gap-5 overflow-x-hidden">
+        <Navigation/>
 
-      <StartDialog />
-      <EndDialog />  
+        <div className="relative self-center">
+          <span style={{
+          position: "absolute",
+          left: coordinates.pageX + dropdownCoordinates.left,
+          top: coordinates.pageY + dropdownCoordinates.top,
+          transform: "translateX(-50%) translateY(-50%)",
+          }}>
+            {/* The key is only used for refreshing the dropdown on touchscreens - if the user guesses correctly and clicks other spots of the image immediately, return the dropdown to its inital state */}
+            {(showDropdown && (playState === "gameboard_guessing")) && <span className="appear" key={`${coordinates.standardX}-${coordinates.standardY}`} onMouseEnter={() => {
+            setShowDropdown(true);
+            clearTimeout(dropdownTimeoutRef.current); // do not close the dropdown while the user's mouse moves around the component
+            }}><Dropdown imageSet={imageSet} bubbleDirection={dropdownCoordinates.bubbleDirection} setShowDropdown={setShowDropdown} dropdownTimeoutRef={dropdownTimeoutRef}/></span>}
+          </span>
+
+          <div onClick={(e) => handleClick(e)} className={`hover:cursor-crosshair ${(playState !== "gameboard_guessing") && "pointer-events-none"}`}>
+            {/* Add blur to image before game begins to prevent users from searching for images before starting the timer (cheating) */}
+            <img className={`pointer-events-none ${(playState !== "gameboard_guessing") && "blur-sm grayscale"}`} src={`/${level.img}/image.png`} width="auto" height="auto" alt={`A pixorama of ${level.title} by eBoy`}/>
+          </div>
+        </div>
+      </section>
     </main>
   )
 }

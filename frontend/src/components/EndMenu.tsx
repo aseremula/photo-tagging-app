@@ -1,12 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 
-function EndDialog({ scoreData } : { scoreData: object }) {
-    // TODO: ensure dialog cannot be closed
-    const endDialogRef = useRef<HTMLDialogElement>(null);
-    // endDialogRef.current?.showModal();
-   
+type apiError = string | null;
+
+function EndMenu({ scoreData } : { scoreData: object }) {
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<apiError>(null);
     const [leaderboardInfo, setLeaderboardInfo] = useState({});
 
     useEffect(() => {
@@ -19,6 +17,7 @@ function EndDialog({ scoreData } : { scoreData: object }) {
         {
             try
             {
+                // TODO: fetch leaderboard stats
                 const response = await fetch("", {mode: 'cors'});
                 if(!response.ok)
                 {
@@ -40,7 +39,14 @@ function EndDialog({ scoreData } : { scoreData: object }) {
             }
             catch(error)
             {
-                setError(error.message);
+                if(error instanceof Error) 
+                {
+                    setError(error.message);
+                }
+                else
+                {
+                    setError("An unknown error has occured.");
+                }
             }
             finally
             {
@@ -52,7 +58,7 @@ function EndDialog({ scoreData } : { scoreData: object }) {
     }, []);
 
   return (
-    <dialog ref={endDialogRef} className="min-w-115 max-w-115 font-(family-name:--roboto-400) text-(--black) text-xl bg-(--tan) border-1 border-(--aqua) border-dashed lg:max-2xl:text-lg">
+    <section className="min-w-115 max-w-115 font-(family-name:--roboto-400) text-(--black) text-xl bg-(--tan) border-1 border-(--aqua) border-dashed lg:max-2xl:text-lg">
         <h3 className="font-(family-name:--bodoni-400) italic text-5xl text-(--light-red) p-3 py-6 bg-(--neon-yellow) border-b-(--aqua) border-b-1 border-dashed lg:max-2xl:text-4xl">Results</h3>
        
        {(isLoading) ? 
@@ -112,13 +118,13 @@ function EndDialog({ scoreData } : { scoreData: object }) {
             </table>
         </div>
 
-        {/* TODO: send user back to StartDialog upon clicking */}
-        <button className="flex gap-1 items-center justify-center font-(family-name:--bodoni-400) italic text-2xl bg-(--aqua) text-(--neon-yellow) cursor-pointer p-3 hover:bg-(--light-aqua) w-[100%] lg:max-2xl:text-xl" type="submit">
+        {/* TODO: send user back to StartMenu upon clicking */}
+        <button className="flex gap-1 items-center justify-center font-(family-name:--bodoni-400) italic text-2xl bg-(--aqua) text-(--neon-yellow) cursor-pointer p-3 hover:bg-(--light-aqua) w-[100%] lg:max-2xl:text-xl" type="button">
             <p>Play Again</p>
             <svg className="w-7 h-7 fill-(--neon-yellow) pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M694-466H212v-28h482L460-728l20-20 268 268-268 268-20-20 234-234Z"/></svg>
         </button>
-    </dialog>
+    </section>
   )
 }
 
-export default EndDialog
+export default EndMenu

@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("LOCAL_DB")
+}
+
+model Level {
+  id          Int          @id @default(autoincrement())
+  levelNumber Int          @unique
+  image       String
+  title       String
+  answers     Answer[]
+  leaderboard Leaderboard?
+}
+
+model Answer {
+  id          String @id @default(uuid())
+  imageNumber Int
+  imageDesc   String @db.VarChar(255)
+  coordinateX Float
+  coordinateY Float
+  level       Level  @relation(fields: [levelId], references: [id], onDelete: Cascade)
+  levelId     Int
+
+  @@unique(name: "coordinates", [coordinateX, coordinateY, levelId])
+  @@unique([imageNumber, levelId])
+}
+
+model Leaderboard {
+  id      Int     @id @default(autoincrement())
+  scores  Score[]
+  level   Level   @relation(fields: [levelId], references: [id], onDelete: Cascade)
+  levelId Int     @unique
+}
+
+model Score {
+  id            String      @id @default(uuid())
+  name          String      @db.VarChar(255)
+  time          String
+  leaderboard   Leaderboard @relation(fields: [leaderboardId], references: [id], onDelete: Cascade)
+  leaderboardId Int
+}

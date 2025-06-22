@@ -12,11 +12,11 @@ async function main() {
           answers: {
             createMany: {
                 data: [
-                    { imageNumber: 1, imageDesc: "A person spray painting the walls of a nearby building", coordinateX: 45.67, coordinateY: 343.67 },
-                    { imageNumber: 2, imageDesc: "A young girl petting a pigeon", coordinateX: 456.67, coordinateY: 37643.67 },
-                    { imageNumber: 3, imageDesc: "A homeless person sitting on the sidewalk", coordinateX: 244.67, coordinateY: 3567.67 },
-                    { imageNumber: 4, imageDesc: "A hippie resting on a bus while holding a flower", coordinateX: 4332.67, coordinateY: 34.67 },
-                    { imageNumber: 5, imageDesc: "A woman in a hot pink dress walking through the streets", coordinateX: 45.67, coordinateY: 33.67 },
+                    { imageNumber: 1, imageDesc: "A person spray painting the walls of a nearby building", coordinateX: 2491, coordinateY: 6144 },
+                    { imageNumber: 2, imageDesc: "A young girl petting a pigeon", coordinateX: 6408, coordinateY: 2843 },
+                    { imageNumber: 3, imageDesc: "A homeless person sitting on the sidewalk", coordinateX: 3430, coordinateY: 2831 },
+                    { imageNumber: 4, imageDesc: "A hippie resting on a bus while holding a flower", coordinateX: 7116, coordinateY: 8565 },
+                    { imageNumber: 5, imageDesc: "A woman in a hot pink dress walking through the streets", coordinateX: 495, coordinateY: 9541 },
                 ],
             },
           },

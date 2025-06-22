@@ -16,7 +16,7 @@ interface dropdownCoordinatesState {
 
 function Gameboard() {
   const [imageSet, setImageSet] = useState(() => new Set([]));
-  const [playState, setPlayState] = useState<playStates>("end_menu");
+  const [playState, setPlayState] = useState<playStates>("gameboard_guessing");
   const [showDropdown, setShowDropdown] = useState(false);
   const [dropdownCoordinates, setDropdownCoordinates] = useState<dropdownCoordinatesState>({ top: -65, left: 2, bubbleDirection: "bottom" });
   const [coordinates, setCoordinates] = useState({ pageX: 0, pageY: 0, standardX: 0, standardY: 0 });
@@ -34,6 +34,7 @@ function Gameboard() {
     // Map the coordinates on a 10,000px x 10,000px image. Include the offset numbers so the dropdown can appear exactly where the user clicked (as these numbers can be different for each screen size)
     const x = Math.round((offsetX / width) * 10000); 
     const y = Math.round((offsetY / height) * 10000);
+
     if(coordinates.standardX === x && coordinates.standardY === y)
     {
       // If the user clicks an area previously clicked, toggle the dropdown accordingly

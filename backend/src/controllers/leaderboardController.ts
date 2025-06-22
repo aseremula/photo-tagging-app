@@ -1,8 +1,7 @@
 require("dotenv").config();
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-// const bcrypt = require("bcryptjs");
 const { body, query, validationResult } = require("express-validator");
 const asyncHandler = require("express-async-handler");
 

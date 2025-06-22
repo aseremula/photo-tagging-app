@@ -8,16 +8,16 @@ const cors = require('cors');
 // TODO: block access from any origin except frontend website
 // See: https://expressjs.com/en/resources/middleware/cors.html#enabling-cors-pre-flight
 
-const levelRouter = require("./routes/levelRouter");
 const nameRouter = require("./routes/nameRouter");
 const leaderboardRouter = require("./routes/leaderboardRouter");
+const gameboardRouter = require("./routes/gameboardRouter");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors()); // enable CORS so API can be accessed from different origins (such as different IPs and URLs)
 
-app.use("/levels", levelRouter);
 app.use("/names", nameRouter);
 app.use("/leaderboards", leaderboardRouter);
+app.use("/gameboards", gameboardRouter);
 
 app.get(/(.*)/, (req: Request, res: Response) => res.status(404).send({
     outcome: "FAILURE",
@@ -39,7 +39,9 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     res.status(err.statusCode || 500).send({
       title: "Internal Server Error",
       description: "An error has occurred while processing your request.",
-      error: err.message,
+      data: {
+        errors: err.message,
+      },
     });
 });
   

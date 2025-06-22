@@ -21,8 +21,8 @@ model Answer {
   id          String @id @default(uuid())
   imageNumber Int
   imageDesc   String @db.VarChar(255)
-  coordinateX Float
-  coordinateY Float
+  coordinateX Int
+  coordinateY Int
   level       Level  @relation(fields: [levelId], references: [id], onDelete: Cascade)
   levelId     Int
 

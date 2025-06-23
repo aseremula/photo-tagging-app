@@ -1,8 +1,7 @@
 require("dotenv").config();
 import { Request, Response, NextFunction } from 'express';
 const express = require("express");
-// const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
-// const { PrismaClient } = require('@prisma/client');
+const session = require("express-session");
 const app = express();
 const cors = require('cors');
 // TODO: block access from any origin except frontend website
@@ -11,13 +10,24 @@ const cors = require('cors');
 const nameRouter = require("./routes/nameRouter");
 const leaderboardRouter = require("./routes/leaderboardRouter");
 const gameboardRouter = require("./routes/gameboardRouter");
+
 app.use(express.json());
+app.use(session({ secret: process.env.SECRET, resave: false, saveUninitialized: false })); // use sessions to store user-specific data like name and leaderboard time
 app.use(express.urlencoded({ extended: true }));
 app.use(cors()); // enable CORS so API can be accessed from different origins (such as different IPs and URLs)
 
 app.use("/names", nameRouter);
 app.use("/leaderboards", leaderboardRouter);
 app.use("/gameboards", gameboardRouter);
+
+// Declare the session data properties:
+// This interface allows the declaring of additional properties on the session object using [declaration merging](https://www.typescriptlang.org/docs/handbook/declaration-merging.html)
+declare module 'express-session' {
+    interface SessionData {
+      name: string;
+      startTime: Date;
+    }
+}
 
 app.get(/(.*)/, (req: Request, res: Response) => res.status(404).send({
     outcome: "FAILURE",

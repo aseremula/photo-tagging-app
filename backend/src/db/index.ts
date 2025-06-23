@@ -1,9 +1,9 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-async function main() {
-    const deleteLevels = await prisma.level.deleteMany({})
-
+// Add levels to the database
+async function loadLevels()
+{
     const levelOne = await prisma.level.create({
         data: {
           levelNumber: 1,
@@ -30,7 +30,14 @@ async function main() {
         },
     });
     console.log(levelOne);
+}
 
+async function main() {
+    const deleteLevels = await prisma.level.deleteMany({});
+
+    loadLevels();
+
+    // To test if levels/answers are present and accurate:
     // const allLevels = await prisma.level.findMany();
     // console.log(allLevels);
 

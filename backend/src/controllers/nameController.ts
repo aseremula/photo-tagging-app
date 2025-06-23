@@ -1,7 +1,5 @@
 require("dotenv").config();
 import { Request, Response } from 'express';
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
 const { body, validationResult } = require("express-validator");
 
 const alphaErr = "can only contain letters.";
@@ -36,7 +34,10 @@ async function namePost(req: Request, res: Response) {
                 errors: errors.array(),
             },
         };
-        
+
+        // If the user's suggested name fails, use the default "Player" name for session data and cancel starting the timer
+        req.session.name = "Player";
+        req.session.startTime = undefined;
         res.status(200).json(invalidData);
     }
     else
@@ -44,13 +45,17 @@ async function namePost(req: Request, res: Response) {
         const validData = {
             outcome: outcomes.SUCCESS,
             title: "Validation Check Success",
-            description: "Validation check successful! Name provided is valid.",
+            description: "Validation check successful! Name provided is valid - timer now activated.",
             data: {
                 isValidName: true,
                 name: name,
             },
         };
 
+        // If the user's suggested name passes, use it for session data and begin the timer by recording the current time
+        req.session.name = name;
+        req.session.startTime = new Date();
+        
         // Send status 202: Accepted
         res.status(202).json(validData);
     }

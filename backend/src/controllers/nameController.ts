@@ -35,9 +35,11 @@ async function namePost(req: Request, res: Response) {
             },
         };
 
-        // If the user's suggested name fails, use the default "Player" name for session data and cancel starting the timer
+        // If the user's suggested name fails, use the default "Player" name for session data, cancel starting the timer, and remove the set containing correctly guessed images
         req.session.name = "Player";
         req.session.startTime = undefined;
+        req.session.endTime = undefined;
+        req.session.correctlyGuessedImages = undefined;
         res.status(200).json(invalidData);
     }
     else
@@ -52,9 +54,10 @@ async function namePost(req: Request, res: Response) {
             },
         };
 
-        // If the user's suggested name passes, use it for session data and begin the timer by recording the current time
+        // If the user's suggested name passes, use it for session data, begin the timer by recording the current time, and declare a set to track the user's correctly guessed images
         req.session.name = name;
         req.session.startTime = new Date();
+        req.session.correctlyGuessedImages = [];
         
         // Send status 202: Accepted
         res.status(202).json(validData);

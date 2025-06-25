@@ -93,14 +93,67 @@ async function gameboardGuessGet(req: Request, res: Response) {
                 },
             },
         });
+        
+        // Find how many answers this level contains in order to keep track of which images the user has found
+        const answerCount = await prisma.answer.count({
+            where: {
+                level: {
+                    levelNumber: parseInt(levelNumber),
+                },
+            },
+        });
 
-        // Convert req.body variables into integers and check if guess fits within the given range
+        // Convert req.body variables into integers and check if user's guess fits within the given range
         let isGuessCorrect = false;
+        let isGameComplete = false;
+        let remainingImages: number[] = [];
+
         const coordinateXGuessNumber = parseInt(coordinateXGuess);
         const coordinateYGuessNumber = parseInt(coordinateYGuess);
         if((coordinateXGuessNumber >= image[0].coordinateX - GUESS_RANGE && coordinateXGuessNumber <= image[0].coordinateX + GUESS_RANGE) && (coordinateYGuessNumber >= image[0].coordinateY - GUESS_RANGE && coordinateYGuessNumber <= image[0].coordinateY + GUESS_RANGE))
         {
             isGuessCorrect = true;
+
+            // If the user has not correctly guessed this image yet, add it to the set
+            if(req.session.correctlyGuessedImages)
+            {
+                // Create a set if this is the first image the user guessed correctly. The set is as large as the number of images in the level
+                if(req.session.correctlyGuessedImages.length === 0)
+                {
+                    req.session.correctlyGuessedImages = new Array(answerCount).fill(false);
+                }
+                req.session.correctlyGuessedImages[imageNumber-1] = true;
+
+                // Win conditions: if all the level's images were found (marked as correctly guessed), record the time and inform user the game is complete
+                if(req.session.correctlyGuessedImages.length === answerCount && !req.session.correctlyGuessedImages.includes(false))
+                {
+                    isGameComplete = true;
+                    req.session.endTime = new Date();
+                }
+
+                // Record which images the user still must find to win the game
+                req.session.correctlyGuessedImages.forEach((imageNumber, index) => { 
+                    if(imageNumber === false) {
+                        remainingImages.push(index+1);
+                    }
+                });
+            }
+            else
+            {
+                // If the session data set tracking correctly guessed images fails, send a response informing the game is not working as intended
+                const internalErrorData = {
+                    outcome: outcomes.FAILURE,
+                    title: "Gameboard Guess GET Failure",
+                    description: "The guessed coordinate was checked, but could not be counted due to an internal server error.",
+                    data: {
+                        imageNumber: imageNumber,
+                        isGuessCorrect: isGuessCorrect,
+                        isGameComplete: null,
+                        remainingImages: null,
+                    },
+                };
+                res.status(200).json(internalErrorData);
+            }
         }
 
         const validData = {
@@ -108,7 +161,10 @@ async function gameboardGuessGet(req: Request, res: Response) {
             title: "Gameboard Guess GET Success",
             description: "Checking the guessed coordinates was successful! Result of guess returned.",
             data: {
+                imageNumber: imageNumber,
                 isGuessCorrect: isGuessCorrect,
+                isGameComplete: isGameComplete,
+                remainingImages: (!isGameComplete && remainingImages.length === 0) ? null : remainingImages,
             },
         };
         res.status(200).json(validData);

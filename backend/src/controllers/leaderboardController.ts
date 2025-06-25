@@ -42,6 +42,15 @@ const validateScore = [
 async function leaderboardPost(req: Request, res: Response) {
     const { levelNumber } = req.body;
     const { numberOfScores } = req.query;
+
+    // Get the number of images needed to win the level
+    const answerCount = await prisma.answer.count({
+        where: {
+            level: {
+                levelNumber: parseInt(levelNumber),
+            },
+        },
+    });
     
     const errors = validationResult(req);
     if(!errors.isEmpty()) 
@@ -57,6 +66,17 @@ async function leaderboardPost(req: Request, res: Response) {
         
         res.status(200).json(invalidData);
     }
+    else if(!req.session.correctlyGuessedImages || (req.session.correctlyGuessedImages && (req.session.correctlyGuessedImages.length !== answerCount || req.session.correctlyGuessedImages.includes(false))))
+    {
+        const incompleteGameData = {
+            outcome: outcomes.FAILURE,
+            title: "Leaderboard POST Failure",
+            description: "POSTing to the leaderboard failed because the game is not complete yet. Find all the images first!",
+            data: {},
+        };
+        
+        res.status(200).json(incompleteGameData);
+    }
     else
     {
         // Grab name from session data. In case the name does not exist, use "Player" instead
@@ -66,19 +86,20 @@ async function leaderboardPost(req: Request, res: Response) {
             leaderboardName = req.session.name;
         }
 
-        // Get start time from session data. If the start time does not exist, use the max time instead. Otherwise, calculate the difference between the start and end times in milliseconds and format it as minutes:seconds.milliseconds
-        const endTime = new Date();
+        // Get start and end time from session data. If the start/end time does not exist, use the max time instead. Otherwise, calculate the difference between the start and end times in milliseconds and format it as minutes:seconds.milliseconds
         let leaderboardTime = "59:59.99"; // minutes:seconds.milliseconds
         const MAX_TIME_MILLISECONDS = 3599990; // leaderboardTime variable in milliseconds
     
-        if(req.session.startTime)
+        if(req.session.startTime && req.session.endTime)
         {
-            const diffMilliseconds = differenceInMilliseconds(endTime, req.session.startTime);
+            const diffMilliseconds = differenceInMilliseconds(req.session.endTime, req.session.startTime);
             if(diffMilliseconds < MAX_TIME_MILLISECONDS)
             {
                 leaderboardTime = format(diffMilliseconds, "m:ss.SS");
             }
-            req.session.startTime = undefined; // prevent a user from submitting multiple scores that may rank in the leaderboard during a single game
+            req.session.startTime = undefined; // prevent a user from submitting multiple scores that may rank in the leaderboard during a single game. The user must start a new game to begin the timer once more
+            req.session.endTime = undefined;
+            req.session.correctlyGuessedImages = undefined;
         }
 
         // Find the level and leaderboard ID in order to POST to correct leaderboard

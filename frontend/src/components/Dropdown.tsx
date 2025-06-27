@@ -3,6 +3,7 @@ import type { RefObject, Dispatch, SetStateAction, MouseEvent } from 'react';
 import ImageIcon from "./ImageIcon";
 import { LevelContext } from '../context/levelContext';
 
+type Coordinates = { pageX: number, pageY: number, standardX: number, standardY: number };
 type GuessResult = "correct" | "incorrect" | "waiting";
 type ImagePosition = 0 | 1 | 2 | 3 | 4 | 5;
 interface guessedImageState {
@@ -10,7 +11,7 @@ interface guessedImageState {
   result: GuessResult;
 }
 
-function Dropdown({imageSet, bubbleDirection, setShowDropdown, dropdownTimeoutRef } : { imageSet: Set<number>, bubbleDirection: "left" | "right" | "bottom" | "top",  setShowDropdown: Dispatch<SetStateAction<boolean>>, dropdownTimeoutRef: RefObject<ReturnType<typeof setTimeout>>}) {
+function Dropdown({ imageSet, bubbleDirection, setShowDropdown, dropdownTimeoutRef, coordinates, correctGuessCoordinates, setCorrectGuessCoordinates } : { imageSet: Set<number>, bubbleDirection: "left" | "right" | "bottom" | "top",  setShowDropdown: Dispatch<SetStateAction<boolean>>, dropdownTimeoutRef: RefObject<ReturnType<typeof setTimeout>>, coordinates: Coordinates, correctGuessCoordinates: Coordinates[], setCorrectGuessCoordinates: Dispatch<SetStateAction<Coordinates[]>>}) {
   const [guessedImage, setGuessedImage] = useState<guessedImageState>({imagePosition: 0, result: "waiting"});
   const level = useContext(LevelContext);
 
@@ -19,6 +20,9 @@ function Dropdown({imageSet, bubbleDirection, setShowDropdown, dropdownTimeoutRe
     e.stopPropagation(); // prevent button click from closing the dropdown as touchscreen users technically left the dropdown's span in the Gameboard component
     setGuessedImage({...guessedImage, imagePosition: imagePosition, result: "correct"}); // TODO: remove when satisfied with UI - this is a temp. replacement for calling API
     
+    // If guess correct, place marker
+    setCorrectGuessCoordinates([...correctGuessCoordinates, coordinates]);
+
     // When clicking an image, clear initial timeout to close dropdown and reset it to a new time after user's guess has been submitted. This feature is for touchscreens; as the user will not be able to close the dropdown by mousing out of it, closing the dropdown after a set amount of time prevents it from hiding part of the image that may have what the user is searching for
 
     // TODO: move below code so it appears after the user's guess is sent to the API and deems it correct/incorrect

@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import Gameboard from "./components/Gameboard";
+import Navigation from './components/Navigation';
+import StartMenu from './components/StartMenu';
+import EndMenu from './components/EndMenu';
 import { LevelContext } from './context/levelContext';
 import type { LevelContextType } from './context/levelContext';
 
@@ -45,16 +48,28 @@ function App() {
     <div>
       {(compatibility === "compatible") ? 
         <LevelContext.Provider value={level}>
-          <Gameboard imageSet={imageSet} playState={playState} correctGuessCoordinates={correctGuessCoordinates} setCorrectGuessCoordinates={setCorrectGuessCoordinates}/>
+          <main className="relative">
+            {/* When either menu is open, gameboard does not accept clicks. However, the navigation still does! */}
+            {(playState === "start_menu" || playState === "end_menu") && 
+              <div className="z-1 fixed bg-black/50 min-h-[100%] w-[100%] flex items-center justify-center">
+                {(playState === "start_menu") ? <StartMenu /> : <EndMenu />}
+              </div>
+            }
+
+            <div className="p-5 bg-(--off-white) flex flex-col justify-center gap-5 overflow-x-hidden">
+              <Navigation/>
+              <Gameboard imageSet={imageSet} playState={playState} correctGuessCoordinates={correctGuessCoordinates} setCorrectGuessCoordinates={setCorrectGuessCoordinates}/>
+            </div>
+          </main> 
         </LevelContext.Provider>
         :
-        <div className="bg-(--off-white) min-h-[100vh] flex flex-col gap-4 justify-start font-(family-name:--roboto-400) text-base">
-          <div className="bg-(--tan) p-5 flex items-center justify-end gap-2 pointer-events-none border-b-(--aqua) border-b-1 border-dashed">
+        <main className="bg-(--off-white) min-h-[100vh] flex flex-col gap-4 justify-start font-(family-name:--roboto-400) text-base">
+          <nav className="bg-(--tan) p-5 flex items-center justify-end gap-2 pointer-events-none border-b-(--aqua) border-b-1 border-dashed">
             <img src="/icon.webp" width="65px" height="auto" alt="eBoy's Blockbob Eater"/>
             <h1 className="text-5xl font-(family-name:--bodoni-400) italic text-(--black)">eFIND</h1> 
-          </div>
+          </nav>
           
-          <div className="m-5 p-5 bg-(--white) flex flex-col gap-1 justify-center shadow-lg">
+          <section className="m-5 p-5 bg-(--white) flex flex-col gap-1 justify-center shadow-lg">
             {(compatibility === "incompatible" || compatibility === "unknown") && 
             <>
             <svg className="self-center w-13 h-13 fill-(--gray) pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M260-100v-163.08q-37.84-16.23-67.34-43t-50.2-60.84q-20.69-34.08-31.57-73.16Q100-479.15 100-520q0-149.54 106.39-244.77Q312.78-860 479.97-860q167.18 0 273.61 95.23Q860-669.54 860-520q0 40.85-10.89 79.92-10.88 39.08-31.57 73.16-20.7 34.07-50.2 60.84-29.5 26.77-67.34 43.07V-100H260Zm60-60h48.46v-70.77h70.77V-160h81.54v-70.77h70.77V-160H640v-142q37.23-10.15 66.73-31.35 29.5-21.19 50.25-50.01 20.75-28.83 31.89-63.62Q800-481.77 800-520q0-125-88.5-202.5T480-800q-143 0-231.5 77.5T160-520q0 38.23 11.13 73.02 11.14 34.79 31.89 63.62 20.75 28.82 50.56 50.01 29.8 21.2 66.42 31.35v142Zm103.85-200h112.3L480-472.31 423.85-360Zm-83.78-87.69q29.85 0 51.04-21.26 21.2-21.26 21.2-51.12 0-29.85-21.26-51.04-21.26-21.2-51.12-21.2-29.85 0-51.04 21.26-21.2 21.26-21.2 51.12 0 29.85 21.26 51.04 21.26 21.2 51.12 21.2Zm280 0q29.85 0 51.04-21.26 21.2-21.26 21.2-51.12 0-29.85-21.26-51.04-21.26-21.2-51.12-21.2-29.85 0-51.04 21.26-21.2 21.26-21.2 51.12 0 29.85 21.26 51.04 21.26 21.2 51.12 21.2ZM480-160Z"/></svg>
@@ -80,8 +95,8 @@ function App() {
             <p className="self-center text-(--aqua)">Gathering pixels...</p>
             </>
             }
-          </div>
-        </div>
+          </section>
+        </main>
       }
     </div>
   )

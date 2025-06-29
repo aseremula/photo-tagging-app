@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("LOCAL_DB")
+  url      = env("NEON_DB") // To show database models on Neon, must perform a prisma migrate
 }
 
 model Level {

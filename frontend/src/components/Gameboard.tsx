@@ -1,9 +1,6 @@
 import { useState, useRef, useContext, useEffect } from 'react';
 import type { MouseEvent } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
-import Navigation from './Navigation';
-import StartMenu from './StartMenu';
-import EndMenu from './EndMenu';
 import Dropdown from './Dropdown';
 import { LevelContext } from '../context/levelContext';
 
@@ -111,50 +108,37 @@ function Gameboard({ imageSet, playState, correctGuessCoordinates, setCorrectGue
   }
 
   return (
-    <main className="relative">
-      {/* When either menu is open, gameboard does not accept clicks. However, the navigation still does! */}
-      {(playState === "start_menu" || playState === "end_menu") && 
-        <div className="z-1 fixed bg-black/50 min-h-[100%] w-[100%] flex items-center justify-center">
-          {(playState === "start_menu") ? <StartMenu /> : <EndMenu />}
-        </div>
-      }
- 
-      <section className="p-5 bg-(--off-white) flex flex-col justify-center gap-5 overflow-x-hidden">
-        <Navigation/>
+    <section className="relative self-center">
+      <span style={{
+      position: "absolute",
+      left: coordinates.pageX + dropdownCoordinates.left,
+      top: coordinates.pageY + dropdownCoordinates.top,
+      transform: "translateX(-50%) translateY(-50%)",
+      }} className="z-2">
+        {/* The key is only used for refreshing the dropdown on touchscreens - if the user guesses correctly and clicks other spots of the image immediately, return the dropdown to its inital state */}
+        {(showDropdown && (playState === "gameboard_guessing")) && <span className="appear" key={`${coordinates.standardX}-${coordinates.standardY}`} onMouseEnter={() => {
+        setShowDropdown(true);
+        clearTimeout(dropdownTimeoutRef.current); // do not close the dropdown while the user's mouse moves around the component
+        }}><Dropdown imageSet={imageSet} bubbleDirection={dropdownCoordinates.bubbleDirection} setShowDropdown={setShowDropdown} dropdownTimeoutRef={dropdownTimeoutRef} coordinates={coordinates} correctGuessCoordinates={correctGuessCoordinates} setCorrectGuessCoordinates={setCorrectGuessCoordinates}/></span>}
+      </span>
 
-        <div className="relative self-center">
-          <span style={{
+      {gameboardMarkers.map((guessCoordinates, index) => 
+        <div key={index} style={{
           position: "absolute",
-          left: coordinates.pageX + dropdownCoordinates.left,
-          top: coordinates.pageY + dropdownCoordinates.top,
+          left: guessCoordinates.pageX,
+          top: guessCoordinates.pageY,
           transform: "translateX(-50%) translateY(-50%)",
-          }} className="z-2">
-            {/* The key is only used for refreshing the dropdown on touchscreens - if the user guesses correctly and clicks other spots of the image immediately, return the dropdown to its inital state */}
-            {(showDropdown && (playState === "gameboard_guessing")) && <span className="appear" key={`${coordinates.standardX}-${coordinates.standardY}`} onMouseEnter={() => {
-            setShowDropdown(true);
-            clearTimeout(dropdownTimeoutRef.current); // do not close the dropdown while the user's mouse moves around the component
-            }}><Dropdown imageSet={imageSet} bubbleDirection={dropdownCoordinates.bubbleDirection} setShowDropdown={setShowDropdown} dropdownTimeoutRef={dropdownTimeoutRef} coordinates={coordinates} correctGuessCoordinates={correctGuessCoordinates} setCorrectGuessCoordinates={setCorrectGuessCoordinates}/></span>}
-          </span>
-
-          {gameboardMarkers.map((guessCoordinates, index) => 
-            <div key={index} style={{
-              position: "absolute",
-              left: guessCoordinates.pageX,
-              top: guessCoordinates.pageY,
-              transform: "translateX(-50%) translateY(-50%)",
-              }} className="bg-(--neon-yellow) opacity-85 rounded-lg lg:max-xl:rounded-sm">
-                <svg className="w-10 h-10 fill-(--light-red) pointer-events-none lg:max-xl:w-5 lg:max-xl:h-5 xl:max-2xl:w-7 xl:max-2xl:h-7" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="m424-312 282-282-56-56-226 226-114-114-56 56 170 170ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z"/></svg>
-            </div>
-          )}
-
-          <div ref={imageRef} onClick={(e) => handleClick(e)} className={`hover:cursor-crosshair ${(playState !== "gameboard_guessing") && "pointer-events-none"}`}>
-            {/* Add blur to image before game begins to prevent users from searching for images before starting the timer (cheating) */}
-            <img className={`pointer-events-none ${(playState !== "gameboard_guessing") && "blur-sm grayscale"}`} src={`/${level.img}/image.png`} width="auto" height="auto" alt={`A pixorama of ${level.title} by eBoy`}/>
-          </div>
+          }} className="bg-(--neon-yellow) opacity-85 rounded-lg lg:max-xl:rounded-sm">
+            <svg className="w-10 h-10 fill-(--light-red) pointer-events-none lg:max-xl:w-5 lg:max-xl:h-5 xl:max-2xl:w-7 xl:max-2xl:h-7" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="m424-312 282-282-56-56-226 226-114-114-56 56 170 170ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z"/></svg>
         </div>
-      </section>
-    </main>
+      )}
+
+      <div ref={imageRef} onClick={(e) => handleClick(e)} className={`hover:cursor-crosshair ${(playState !== "gameboard_guessing") && "pointer-events-none"}`}>
+        {/* Add blur to image before game begins to prevent users from searching for images before starting the timer (cheating) */}
+        <img className={`pointer-events-none ${(playState !== "gameboard_guessing") && "blur-sm grayscale"}`} src={`/${level.img}/image.png`} width="auto" height="auto" alt={`A pixorama of ${level.title} by eBoy`}/>
+      </div>
+    </section>
   )
 }
 
-export default Gameboard
+export default Gameboard;

@@ -24,6 +24,7 @@
   "dependencies": {
     "@prisma/client": "^6.10.0",
     "@types/express-validator": "^2.20.33",
+    "cookie-session": "^2.1.0",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
     "express-async-handler": "^1.2.0",

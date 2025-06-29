@@ -1,7 +1,7 @@
 require("dotenv").config();
 import { Request, Response, NextFunction } from 'express';
 const express = require("express");
-const session = require("express-session");
+const session = require("cookie-session");
 const app = express();
 const cors = require('cors');
 // TODO: block access from any origin except frontend website

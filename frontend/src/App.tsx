@@ -8,7 +8,11 @@ type DeviceCompatibility = "compatible" | "rotate" | "incompatible" | "unknown" 
 function App() {
   const WIDTH_BREAKPOINT = 592; // only support responsive design for devices with this screen width in pixels or higher due to using such a wide/detailed image
   const [compatibility, setCompatibility] = useState<DeviceCompatibility>("loading");
-  const [level, setLevel] = useState<LevelContextType>({ img: "san_francisco", title: "San Francisco" });
+  const [level, setLevel] = useState<LevelContextType>({ img: "san_francisco", title: "San Francisco", numberOfImages: 5 });
+
+  const [imageSet, setImageSet] = useState(() => new Set([]));
+  const [playState, setPlayState] = useState<playStates>("gameboard_guessing");
+  const [correctGuessCoordinates, setCorrectGuessCoordinates] = useState([{ pageX: 646, pageY: 248, standardX: 5583, standardY: 3026 }]);
 
   useEffect(() => {
     isDeviceCompatible(); // for initial load of app
@@ -41,7 +45,7 @@ function App() {
     <div>
       {(compatibility === "compatible") ? 
         <LevelContext.Provider value={level}>
-          <Gameboard/>
+          <Gameboard imageSet={imageSet} playState={playState} correctGuessCoordinates={correctGuessCoordinates} setCorrectGuessCoordinates={setCorrectGuessCoordinates}/>
         </LevelContext.Provider>
         :
         <div className="bg-(--off-white) min-h-[100vh] flex flex-col gap-4 justify-start font-(family-name:--roboto-400) text-base">

@@ -1,33 +1,29 @@
 import { useState, useRef, useContext, useEffect } from 'react';
 import type { MouseEvent } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import Navigation from './Navigation';
 import StartMenu from './StartMenu';
 import EndMenu from './EndMenu';
 import Dropdown from './Dropdown';
 import { LevelContext } from '../context/levelContext';
 
-type Coordinates = { pageX: number, pageY: number, standardX: number, standardY: number };
-type BubbleDirection = "top" | "bottom" | "left" | "right";
-type playStates = "start_menu" | "gameboard_guessing" | "end_menu";
 interface dropdownCoordinatesState {
   top: number;
   left: number;
   bubbleDirection: BubbleDirection;
 }
 
-function Gameboard() {
-  const [imageSet, setImageSet] = useState(() => new Set([]));
-  const [playState, setPlayState] = useState<playStates>("gameboard_guessing");
+function Gameboard({ imageSet, playState, correctGuessCoordinates, setCorrectGuessCoordinates }: { imageSet: Set<number>, playState: playStates, correctGuessCoordinates: Coordinates[], setCorrectGuessCoordinates: Dispatch<SetStateAction<Coordinates[]>> }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [dropdownCoordinates, setDropdownCoordinates] = useState<dropdownCoordinatesState>({ top: -65, left: 2, bubbleDirection: "bottom" });
   const [coordinates, setCoordinates] = useState({ pageX: 0, pageY: 0, standardX: 0, standardY: 0 });
   const dropdownTimeoutRef = useRef(0);
   const level = useContext(LevelContext);
-  const STANDARDIZED_IMAGE_SIZE = 10000; // provides standardized coordinates on the gameboard across all devices
+  const STANDARDIZED_IMAGE_SIZE = 10000; // provides standardized coordinates on a n x n gameboard across all devices
 
   // When user correctly guesses an image, place a marker on that image in the gameboard. Reposition the marker if the user's screen size changes
   const imageRef = useRef<HTMLDivElement>(null);
-  const [correctGuessCoordinates, setCorrectGuessCoordinates] = useState([{ pageX: 646, pageY: 248, standardX: 5583, standardY: 3026 }]);
+  const [gameboardMarkers, setGameboardMarkers] = useState<Coordinates[]>([]);
   useEffect(() => {
     function repositionCorrectGuessMarkers() 
     {
@@ -37,7 +33,6 @@ function Gameboard() {
         {
           const newPageX = Math.round(imageRef.current.getBoundingClientRect().width*(guessCoordinates.standardX/STANDARDIZED_IMAGE_SIZE));
           const newPageY = Math.round(imageRef.current.getBoundingClientRect().height*(guessCoordinates.standardY/STANDARDIZED_IMAGE_SIZE));
-
           const newCoordinate = {...guessCoordinates, pageX: newPageX, pageY: newPageY};
           recalibratedCoordinates.push(newCoordinate);
         }
@@ -46,13 +41,14 @@ function Gameboard() {
           throw new Error(`Could not reposition marker on correctly guessed image #${index+1} due to an internal client error.`);
         }
       });
-      setCorrectGuessCoordinates(recalibratedCoordinates);
+      setGameboardMarkers(recalibratedCoordinates);
+      setShowDropdown(false);
     }
 
     window.addEventListener("resize", repositionCorrectGuessMarkers);
     repositionCorrectGuessMarkers();
     return () => window.removeEventListener("resize", repositionCorrectGuessMarkers);
-  }, []);
+  }, [correctGuessCoordinates]);
 
   function getClickCoords(event: MouseEvent<HTMLElement>)
   {
@@ -140,7 +136,7 @@ function Gameboard() {
             }}><Dropdown imageSet={imageSet} bubbleDirection={dropdownCoordinates.bubbleDirection} setShowDropdown={setShowDropdown} dropdownTimeoutRef={dropdownTimeoutRef} coordinates={coordinates} correctGuessCoordinates={correctGuessCoordinates} setCorrectGuessCoordinates={setCorrectGuessCoordinates}/></span>}
           </span>
 
-          {correctGuessCoordinates.map((guessCoordinates, index) => 
+          {gameboardMarkers.map((guessCoordinates, index) => 
             <div key={index} style={{
               position: "absolute",
               left: guessCoordinates.pageX,

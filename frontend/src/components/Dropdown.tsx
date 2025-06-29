@@ -3,7 +3,6 @@ import type { RefObject, Dispatch, SetStateAction, MouseEvent } from 'react';
 import ImageIcon from "./ImageIcon";
 import { LevelContext } from '../context/levelContext';
 
-type Coordinates = { pageX: number, pageY: number, standardX: number, standardY: number };
 type GuessResult = "correct" | "incorrect" | "waiting";
 type ImagePosition = 0 | 1 | 2 | 3 | 4 | 5;
 interface guessedImageState {
@@ -11,7 +10,7 @@ interface guessedImageState {
   result: GuessResult;
 }
 
-function Dropdown({ imageSet, bubbleDirection, setShowDropdown, dropdownTimeoutRef, coordinates, correctGuessCoordinates, setCorrectGuessCoordinates } : { imageSet: Set<number>, bubbleDirection: "left" | "right" | "bottom" | "top",  setShowDropdown: Dispatch<SetStateAction<boolean>>, dropdownTimeoutRef: RefObject<ReturnType<typeof setTimeout>>, coordinates: Coordinates, correctGuessCoordinates: Coordinates[], setCorrectGuessCoordinates: Dispatch<SetStateAction<Coordinates[]>>}) {
+function Dropdown({ imageSet, bubbleDirection, setShowDropdown, dropdownTimeoutRef, coordinates, correctGuessCoordinates, setCorrectGuessCoordinates } : { imageSet: Set<number>, bubbleDirection: BubbleDirection,  setShowDropdown: Dispatch<SetStateAction<boolean>>, dropdownTimeoutRef: RefObject<ReturnType<typeof setTimeout>>, coordinates: Coordinates, correctGuessCoordinates: Coordinates[], setCorrectGuessCoordinates: Dispatch<SetStateAction<Coordinates[]>>}) {
   const [guessedImage, setGuessedImage] = useState<guessedImageState>({imagePosition: 0, result: "waiting"});
   const level = useContext(LevelContext);
 
@@ -33,10 +32,9 @@ function Dropdown({ imageSet, bubbleDirection, setShowDropdown, dropdownTimeoutR
     }, 5000);
   }
 
-  const NUMBER_OF_IMAGES = 5;
   const renderList = () => {
     const listItems = [];
-    for (let imageCounter = 1; imageCounter <= NUMBER_OF_IMAGES; imageCounter++) {
+    for (let imageCounter = 1; imageCounter <= level.numberOfImages; imageCounter++) {
       if(!imageSet.has(imageCounter)) {
         listItems.push(
           <li key={imageCounter} className="flex items-center justify-center">

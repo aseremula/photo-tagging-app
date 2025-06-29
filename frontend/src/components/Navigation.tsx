@@ -5,10 +5,9 @@ import { LevelContext } from '../context/levelContext';
 function Navigation() {
   const level = useContext(LevelContext);
 
-  const NUMBER_OF_IMAGES = 5;
   const renderList = () => {
     const listItems = [];
-    for (let imageCounter = 1; imageCounter <= NUMBER_OF_IMAGES; imageCounter++) {
+    for (let imageCounter = 1; imageCounter <= level.numberOfImages; imageCounter++) {
       listItems.push(
         <li key={imageCounter}><ImageIcon key={imageCounter} imagePath={`/${level.img}/${imageCounter}.jpg`} markAsFound={false} /></li>
       );

@@ -6,6 +6,8 @@ const { body, query, validationResult } = require("express-validator");
 const asyncHandler = require("express-async-handler");
 const { differenceInMilliseconds, format } = require("date-fns");
 
+type Score = { id: string, name: string, time: string, leaderboardId: number };
+
 const intRangeErr = "must be an integer between greater than 0 and less than 25.";
 const intErr = "must be an integer.";
 const doesNotExistErr = "does not exist.";
@@ -43,6 +45,11 @@ async function leaderboardPost(req: Request, res: Response) {
     const { levelNumber } = req.body;
     const { numberOfScores } = req.query;
 
+    // TODO: remove next 3 lines when done testing menus
+    console.log(req.session.startTime);
+    console.log(req.session.endTime);
+    req.session.endTime = new Date();
+
     // Get the number of images needed to win the level
     const answerCount = await prisma.answer.count({
         where: {
@@ -66,17 +73,17 @@ async function leaderboardPost(req: Request, res: Response) {
         
         res.status(200).json(invalidData);
     }
-    else if(!req.session.correctlyGuessedImages || (req.session.correctlyGuessedImages && (req.session.correctlyGuessedImages.length !== answerCount || req.session.correctlyGuessedImages.includes(false))))
-    {
-        const incompleteGameData = {
-            outcome: outcomes.FAILURE,
-            title: "Leaderboard POST Failure",
-            description: "POSTing to the leaderboard failed because the game is not complete yet. Find all the images first!",
-            data: {},
-        };
+    // else if(!req.session.correctlyGuessedImages || (req.session.correctlyGuessedImages && (req.session.correctlyGuessedImages.length !== answerCount || req.session.correctlyGuessedImages.includes(false))))
+    // {
+    //     const incompleteGameData = {
+    //         outcome: outcomes.FAILURE,
+    //         title: "Leaderboard POST Failure",
+    //         description: "POSTing to the leaderboard failed because the game is not complete yet. Find all the images first!",
+    //         data: {},
+    //     };
         
-        res.status(200).json(incompleteGameData);
-    }
+    //     res.status(200).json(incompleteGameData);
+    // }
     else
     {
         // Grab name from session data. In case the name does not exist, use "Player" instead
@@ -121,8 +128,8 @@ async function leaderboardPost(req: Request, res: Response) {
             },
         });
 
-        // With this new score added to the level's leaderboard, grab either all the players or the top X players (if numberOfScores was provided)
-        const leaderboardScores = await prisma.leaderboard.findUnique({
+        // With this new score added to the level's leaderboard, grab all players from the leaderboard
+        const allLeaderboardScores = await prisma.leaderboard.findUnique({
             where: {
                 id: level.leaderboard.id,
             },
@@ -131,11 +138,37 @@ async function leaderboardPost(req: Request, res: Response) {
                     orderBy: {
                         time: 'asc', // smallest to largest times
                     },
-                    take: ((typeof numberOfScores === "string") ? parseInt(numberOfScores) : prisma.skip),
+
                 },
             },
         });
+        
+        const leaderboardScores = allLeaderboardScores;
 
+        // Determine the rank of the user and if their score is in the current top X high scores. To prevent calling the database a second time, keep X high scores when iterating through all scores
+        let playerRank: number | null = null;
+        const selectScores: Score[] = [];
+        allLeaderboardScores.scores.forEach((score: Score, index: number) => {
+            if(score.id === playerScore.id)
+            {
+                playerRank = index+1;
+            }
+
+            // Since we have all leaderboard scores, only keep the amount of scores the user asked for
+            if(typeof numberOfScores === "string" && index < parseInt(numberOfScores))
+            {
+                selectScores.push(score);
+            }
+        });
+
+        // If the user requests a certain number of scores, only return the entered amount
+        if(numberOfScores && typeof numberOfScores === "string")
+        {
+            leaderboardScores.scores = selectScores;
+        }
+        
+        const isPlayerOnLeaderboard = ((typeof numberOfScores === "string") && playerRank && playerRank <= parseInt(numberOfScores)) ? true : false;
+        
         const validData = {
             outcome: outcomes.SUCCESS,
             title: "Leaderboard POST Success",
@@ -143,6 +176,8 @@ async function leaderboardPost(req: Request, res: Response) {
             data: {
                 playerScore: playerScore,
                 leaderboardScores: leaderboardScores,
+                isPlayerOnLeaderboard: isPlayerOnLeaderboard,  
+                playerRank: playerRank,
             },
         };
 

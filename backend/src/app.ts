@@ -12,9 +12,23 @@ const leaderboardRouter = require("./routes/leaderboardRouter");
 const gameboardRouter = require("./routes/gameboardRouter");
 
 app.use(express.json());
-app.use(session({ secret: process.env.SECRET, resave: false, saveUninitialized: false })); // use sessions to store user-specific data like name and leaderboard time
+app.use(session({ 
+  secret: process.env.SECRET, 
+  resave: false, saveUninitialized: false, 
+  cookie: {
+    sameSite: 'none', // allow explicit cross-site cookies as the front and back-end are on different sites
+    secure: true, // require cookies to be served over HTTPS and not HTTP
+    httpOnly: true, // stop client-side JavaScript access to cookie, which prevents cross-site scripting (XSS) attacks
+  }, 
+})); // use sessions to store user-specific data like name and leaderboard time
 app.use(express.urlencoded({ extended: true }));
-app.use(cors()); // enable CORS so API can be accessed from different origins (such as different IPs and URLs)
+app.use(
+  cors({
+    origin: "http://localhost:5173", // TODO: change to non-localhost link
+    methods: ["POST", "GET", "PUT", "OPTIONS", "HEAD"],
+    credentials: true, // Enable cookies and credentials
+  })
+); // enable CORS so API can be accessed from different origins (such as different IPs and URLs)
 
 app.use("/names", nameRouter);
 app.use("/leaderboards", leaderboardRouter);

@@ -141,6 +141,7 @@ async function gameboardGuessGet(req: Request, res: Response) {
             else
             {
                 // If the session data set tracking correctly guessed images fails, send a response informing the game is not working as intended
+                // This also catches if the cookie data was removed/edited
                 const internalErrorData = {
                     outcome: outcomes.FAILURE,
                     title: "Gameboard Guess GET Failure",
@@ -153,6 +154,7 @@ async function gameboardGuessGet(req: Request, res: Response) {
                     },
                 };
                 res.status(200).json(internalErrorData);
+                return;
             }
         }
 

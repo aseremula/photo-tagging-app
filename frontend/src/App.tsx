@@ -11,11 +11,12 @@ type DeviceCompatibility = "compatible" | "rotate" | "incompatible" | "unknown" 
 function App() {
   const WIDTH_BREAKPOINT = 592; // only support responsive design for devices with this screen width in pixels or higher due to using such a wide/detailed image
   const [compatibility, setCompatibility] = useState<DeviceCompatibility>("loading");
-  const [level, setLevel] = useState<LevelContextType>({ img: "san_francisco", title: "San Francisco", numberOfImages: 5 });
+  const [level, setLevel] = useState<LevelContextType>({ img: "san_francisco", title: "San Francisco", numberOfImages: 5, levelNumber: 1 });
 
   const [imageSet, setImageSet] = useState(() => new Set([]));
-  const [playState, setPlayState] = useState<playStates>("gameboard_guessing");
+  const [playState, setPlayState] = useState<playStates>("end_menu");
   const [correctGuessCoordinates, setCorrectGuessCoordinates] = useState([{ pageX: 646, pageY: 248, standardX: 5583, standardY: 3026 }]);
+  const [playerName, setPlayerName] = useState("Player");
 
   useEffect(() => {
     isDeviceCompatible(); // for initial load of app
@@ -52,7 +53,7 @@ function App() {
             {/* When either menu is open, gameboard does not accept clicks. However, the navigation still does! */}
             {(playState === "start_menu" || playState === "end_menu") && 
               <div className="z-1 fixed bg-black/50 min-h-[100%] w-[100%] flex items-center justify-center">
-                {(playState === "start_menu") ? <StartMenu /> : <EndMenu />}
+                {(playState === "start_menu") ? <StartMenu setPlayState={setPlayState} playerName={playerName} setPlayerName={setPlayerName}/> : <EndMenu setPlayState={setPlayState} levelNumber={level.levelNumber} numberOfScores={5} playerName={playerName}/>}
               </div>
             }
 

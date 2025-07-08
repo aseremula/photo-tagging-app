@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 const { body, validationResult } = require("express-validator");
 
 const alphaErr = "can only contain letters.";
-const nonoptional_name_lengthErr = "must be between 1 and 70 characters.";
+const nonoptional_name_lengthErr = "must be between 1 and 30 characters.";
 const requiredErr = "is required.";
 const outcomes = {
     SUCCESS: "SUCCESS",
@@ -14,7 +14,7 @@ const validateName = [
     body("name").trim().escape()
     .not().isEmpty().withMessage({category: "name", description: `Name ${requiredErr}`}).bail()
     .isAlpha("en-US", { ignore: ' ' }).withMessage({category: "name", description: `Name ${alphaErr}`}).bail()
-    .isLength({ min: 1, max: 70 }).withMessage({category: "name", description: `Name ${nonoptional_name_lengthErr}`}).bail(),
+    .isLength({ min: 1, max: 30 }).withMessage({category: "name", description: `Name ${nonoptional_name_lengthErr}`}).bail(),
 ];
 
 // Check if the name submitted is valid to use in leaderboard
@@ -58,7 +58,7 @@ async function namePost(req: Request, res: Response) {
         req.session.name = name;
         req.session.startTime = new Date();
         req.session.correctlyGuessedImages = [];
-        
+
         // Send status 202: Accepted
         res.status(202).json(validData);
     }

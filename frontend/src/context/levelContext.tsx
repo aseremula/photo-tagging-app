@@ -5,6 +5,7 @@ export interface LevelContextType {
     img: "san_francisco";
     title: "San Francisco";
     numberOfImages: 5;
+    levelNumber: 1;
 }
 
-export const LevelContext = createContext<LevelContextType>({ img: "san_francisco", title: "San Francisco", numberOfImages: 5 });
+export const LevelContext = createContext<LevelContextType>({ img: "san_francisco", title: "San Francisco", numberOfImages: 5, levelNumber: 1 });

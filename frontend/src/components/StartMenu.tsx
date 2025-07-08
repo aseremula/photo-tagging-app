@@ -1,4 +1,5 @@
 import { useState, useContext, type FormEvent } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import { LevelContext } from '../context/levelContext';
 
 // From: https://www.epicreact.dev/how-to-type-a-react-form-on-submit-handler
@@ -12,15 +13,30 @@ interface NameFormElement extends HTMLFormElement {
     readonly elements: FormElements
 }
 
-function StartMenu() {
+type apiErrorResponse = {
+    location: string;
+    msg: {
+        category: string;
+        description: string;
+    };
+    path: string;
+    type: string;
+    value: string;
+}
+
+interface formErrors {
+   [key: string]: apiErrorResponse | null;
+};
+
+function StartMenu({ setPlayState, playerName, setPlayerName } : { setPlayState: Dispatch<SetStateAction<playStates>>, playerName: string, setPlayerName: Dispatch<SetStateAction<string>> }) {
     const level = useContext(LevelContext);
 
     const [formData, setFormData] = useState({
-        name: "",
+        name: playerName,
     });
 
-    const [formErrors, setFormErrors] = useState({
-        name: {},
+    const [formErrors, setFormErrors] = useState<formErrors>({
+        name: null,
     });
 
     async function handleStartForm(e: FormEvent<NameFormElement>)
@@ -32,12 +48,13 @@ function StartMenu() {
         };
 
         // Remove previous form errors before showing new ones (if any exist)
-        const newFormErrors = {
-            name: {},
+        const newFormErrors: formErrors = {
+            name: null,
         };
     
         const name = e.currentTarget.elements.name.value;
-        const path = ""; // TODO: update path
+        const path = "https://efind-qk5v.onrender.com/names";
+        // const path = "http://localhost:3003/names";
         const method = "POST";
         const body = { 
             name: name, 
@@ -48,8 +65,7 @@ function StartMenu() {
         {
             if(response.outcome === outcomes.FAILURE)
             {
-                // TODO: make type shaped like error object
-                response.data.errors.forEach((error: object) => {
+                response.data.errors.forEach((error: apiErrorResponse) => {
                     if(error.msg.category === "name")
                     {
                         newFormErrors.name = error;
@@ -59,7 +75,10 @@ function StartMenu() {
             }
             else if(response.outcome === outcomes.SUCCESS)
             {
-                // Close modal, show image, and start timer
+                // TODO: Close modal, show image, and start timer
+                // setPlayState("gameboard_guessing");
+                setPlayState("end_menu");
+                setPlayerName(name);
             } 
             setFormErrors(newFormErrors);   
         }  
@@ -81,6 +100,7 @@ function StartMenu() {
                 mode: 'cors', 
                 method: method, 
                 headers: headers,
+                credentials: 'include', // must add this when using cookies so credentials (cookies) are sent with request to server 
                 body: JSON.stringify(body),
             });
 
@@ -109,33 +129,34 @@ function StartMenu() {
     }
 
   return (
-    <section className="min-w-115 max-w-115 font-(family-name:--roboto-400) text-(--black) text-xl bg-(--tan) border-1 border-(--aqua) border-dashed pb-3 lg:max-2xl:text-lg">
-        <h3 className="font-(family-name:--bodoni-400) italic text-5xl text-(--light-red) p-3 py-6 bg-(--neon-yellow) border-b-(--aqua) border-b-1 border-dashed lg:max-2xl:text-4xl">Instructions</h3>
+    <section className="min-w-115 max-w-115 font-(family-name:--roboto-400) text-(--black) text-xl bg-(--tan) border-1 border-(--aqua) border-dashed pb-3 lg:max-xl:text-base xl:max-2xl:text-lg">
+        <h3 className="font-(family-name:--bodoni-400) italic text-5xl text-(--light-red) p-3 py-6 bg-(--neon-yellow) border-b-(--aqua) border-b-1 border-dashed lg:max-xl:text-3xl lg:max-xl:py-4 xl:max-2xl:text-4xl xl:max-2xl:p-5">Instructions</h3>
         <p className="p-3">Can you find these 5 people scattered throughout eBoy's <span className="text-(--aqua) font-bold">{level.title}</span> pixorama? Find and click them fast enough and you may even appear on the leaderboard!</p>
 
         <form className="flex flex-col gap-1 p-3" id="nameForm" action="" method="POST" onSubmit={handleStartForm}>
-            <legend className="font-bold text-lg text-(--gray) lg:max-2xl:text-md">Enter your name to begin:</legend>
+            <legend className="font-bold text-lg text-(--gray) lg:max-xl:text-base xl:max-2xl:text-md">Enter your name to begin:</legend>
+            
             <div className="flex items-center gap-2">
                 <div>
                     <label className="aria-invisible" htmlFor="name">Name</label>
-                    <input className={`w-[100%] font-(family-name:--roboto-400) text-xl bg-(--off-white) p-3 border-2 rounded-lg ${(Object.keys(formErrors.name).length !== 0) ? "border-(--light-red)" : "border-(--black)"} lg:max-2xl:text-lg`} autoFocus={true} id="name" type="text" name="name" placeholder="John Doe" value={formData.name} onChange={(e) => {
+                    <input className={`w-[100%] font-(family-name:--roboto-400) text-xl bg-(--off-white) p-3 border-2 rounded-lg ${(formErrors.name !== null) ? "border-(--light-red)" : "border-(--black)"}  lg:max-xl:text-base xl:max-2xl:text-lg`} autoFocus={true} id="name" type="text" name="name" placeholder="John Doe" value={formData.name} onChange={(e) => {
                         setFormData({...formData, name: e.target.value}); 
                     }}/>
-
-                    <div className="flex flex-col items-end">
-                        {(Object.keys(formErrors.name).length !== 0) && <p className="text-sm text-(--light-red) font-bold text-right">{formErrors.name.msg.description}</p>}
-                    </div>    
                 </div>
                 
                 {/* TODO: clicking button submits form and if name passes, starts gameplay and timer */}
-                <button className="flex gap-1 items-center justify-center font-(family-name:--bodoni-400) italic text-2xl bg-(--aqua) text-(--neon-yellow) cursor-pointer p-3 hover:bg-(--light-aqua) lg:max-2xl:text-xl" type="submit">
+                <button className="flex gap-1 items-center justify-center font-(family-name:--bodoni-400) italic text-2xl bg-(--aqua) text-(--neon-yellow) cursor-pointer p-3 hover:bg-(--light-aqua) lg:max-xl:text-lg xl:max-2xl:text-xl" type="submit">
                     <p>Start</p>
-                    <svg className="w-7 h-7 fill-(--neon-yellow) pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M694-466H212v-28h482L460-728l20-20 268 268-268 268-20-20 234-234Z"/></svg>
+                    <svg className="w-7 h-7 fill-(--neon-yellow) pointer-events-none lg:max-xl:w-6 lg:max-xl:h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M694-466H212v-28h482L460-728l20-20 268 268-268 268-20-20 234-234Z"/></svg>
                 </button>
+            </div>
+
+            <div className="flex flex-col">
+                {(formErrors.name !== null) && <p className="text-sm text-(--light-red) font-bold lg:max-xl:text-xs">{formErrors.name.msg.description}</p>}
             </div>
         </form>
     </section>
   )
 }
 
-export default StartMenu
+export default StartMenu;

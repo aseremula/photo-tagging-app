@@ -4,8 +4,6 @@ const express = require("express");
 const session = require("cookie-session");
 const app = express();
 const cors = require('cors');
-// TODO: block access from any origin except frontend website
-// See: https://expressjs.com/en/resources/middleware/cors.html#enabling-cors-pre-flight
 
 const nameRouter = require("./routes/nameRouter");
 const leaderboardRouter = require("./routes/leaderboardRouter");
@@ -17,16 +15,17 @@ app.use(session({
   resave: false, saveUninitialized: false, 
   cookie: {
     sameSite: 'none', // allow explicit cross-site cookies as the front and back-end are on different sites
-    secure: true, // require cookies to be served over HTTPS and not HTTP
+    secure: true, // require cookies to be served over HTTPS and not HTTP - must be true when sameSite is 'none'
     httpOnly: true, // stop client-side JavaScript access to cookie, which prevents cross-site scripting (XSS) attacks
   }, 
 })); // use sessions to store user-specific data like name and leaderboard time
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "http://localhost:5173", // TODO: change to non-localhost link
+    origin: ["https://efseek.netlify.app", "http://localhost:5173"],
     methods: ["POST", "GET", "PUT", "OPTIONS", "HEAD"],
     credentials: true, // Enable cookies and credentials
+    optionsSuccessStatus: 200, // For legacy browser support
   })
 ); // enable CORS so API can be accessed from different origins (such as different IPs and URLs)
 

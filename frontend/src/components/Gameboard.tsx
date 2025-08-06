@@ -10,7 +10,7 @@ interface dropdownCoordinatesState {
   bubbleDirection: BubbleDirection;
 }
 
-function Gameboard({ imageSet, playState, correctGuessCoordinates, setCorrectGuessCoordinates }: { imageSet: Set<number>, playState: playStates, correctGuessCoordinates: Coordinates[], setCorrectGuessCoordinates: Dispatch<SetStateAction<Coordinates[]>> }) {
+function Gameboard({ imageSet, setImageSet, playState, setPlayState, correctGuessCoordinates, setCorrectGuessCoordinates }: { imageSet: boolean[], setImageSet: Dispatch<SetStateAction<boolean[]>>, playState: playStates, setPlayState: Dispatch<SetStateAction<playStates>>, correctGuessCoordinates: Coordinates[], setCorrectGuessCoordinates: Dispatch<SetStateAction<Coordinates[]>> }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [dropdownCoordinates, setDropdownCoordinates] = useState<dropdownCoordinatesState>({ top: -65, left: 2, bubbleDirection: "bottom" });
   const [coordinates, setCoordinates] = useState({ pageX: 0, pageY: 0, standardX: 0, standardY: 0 });
@@ -119,7 +119,7 @@ function Gameboard({ imageSet, playState, correctGuessCoordinates, setCorrectGue
         {(showDropdown && (playState === "gameboard_guessing")) && <span className="appear" key={`${coordinates.standardX}-${coordinates.standardY}`} onMouseEnter={() => {
         setShowDropdown(true);
         clearTimeout(dropdownTimeoutRef.current); // do not close the dropdown while the user's mouse moves around the component
-        }}><Dropdown imageSet={imageSet} bubbleDirection={dropdownCoordinates.bubbleDirection} setShowDropdown={setShowDropdown} dropdownTimeoutRef={dropdownTimeoutRef} coordinates={coordinates} correctGuessCoordinates={correctGuessCoordinates} setCorrectGuessCoordinates={setCorrectGuessCoordinates}/></span>}
+        }}><Dropdown imageSet={imageSet} setImageSet={setImageSet} bubbleDirection={dropdownCoordinates.bubbleDirection} setPlayState={setPlayState} setShowDropdown={setShowDropdown} dropdownTimeoutRef={dropdownTimeoutRef} coordinates={coordinates} correctGuessCoordinates={correctGuessCoordinates} setCorrectGuessCoordinates={setCorrectGuessCoordinates}/></span>}
       </span>
 
       {gameboardMarkers.map((guessCoordinates, index) => 
@@ -129,7 +129,7 @@ function Gameboard({ imageSet, playState, correctGuessCoordinates, setCorrectGue
           top: guessCoordinates.pageY,
           transform: "translateX(-50%) translateY(-50%)",
           }} className="bg-(--neon-yellow) opacity-85 rounded-lg lg:max-xl:rounded-sm">
-            <svg className="w-10 h-10 fill-(--light-red) pointer-events-none lg:max-xl:w-5 lg:max-xl:h-5 xl:max-2xl:w-7 xl:max-2xl:h-7" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="m424-312 282-282-56-56-226 226-114-114-56 56 170 170ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z"/></svg>
+            <svg className="markerEnter w-10 h-10 fill-(--light-red) pointer-events-none lg:max-xl:w-5 lg:max-xl:h-5 xl:max-2xl:w-7 xl:max-2xl:h-7" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="m424-312 282-282-56-56-226 226-114-114-56 56 170 170ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z"/></svg>
         </div>
       )}
 

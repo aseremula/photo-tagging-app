@@ -2,10 +2,10 @@ require("dotenv").config();
 import { Request, Response } from 'express';
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-const { body, param, validationResult, Meta } = require("express-validator");
+const { query, param, validationResult, Meta } = require("express-validator");
 const asyncHandler = require("express-async-handler");
 
-const GUESS_RANGE = 150; // guess must be within this many pixels to count
+const GUESS_RANGE = 175; // guess must be within this many pixels to count
 const guessRangeErr = "must be an integer between 0 and 10000.";
 const intRangeErr = "must be an integer between 1 and 5.";
 const intErr = "must be an integer.";
@@ -17,11 +17,11 @@ const outcomes = {
 };
 
 const validateGuess = [
-    body("coordinateXGuess").trim().escape()
+    query("coordinateXGuess").trim().escape()
     .not().isEmpty().withMessage({category: "coordinateX", description: `The X coordinate guess ${requiredErr}`}).bail()
     .isInt({min: 0, max: 10000}).withMessage({category: "coordinateX", description: `The X coordinate guess ${guessRangeErr}`}).bail(),
 
-    body("coordinateYGuess").trim().escape()
+    query("coordinateYGuess").trim().escape()
     .not().isEmpty().withMessage({category: "coordinateY", description: `The Y coordinate guess ${requiredErr}`}).bail()
     .isInt({min: 0, max: 10000}).withMessage({category: "coordinateY", description: `The Y coordinate guess ${guessRangeErr}`}).bail(),
 
@@ -42,7 +42,7 @@ const validateGuess = [
         return true;
     })).withMessage({category: "levelNumber", description: `A level with this number ${doesNotExistErr}`}).bail(),
 
-    body("imageNumber").trim().escape()
+    query("imageNumber").trim().escape()
     .not().isEmpty().withMessage({category: "imageNumber", description: `The image number ${requiredErr}`}).bail()
     .isInt({min: 1, max: 5}).withMessage({category: "imageNumber", description: `The image number ${intRangeErr}`}).bail()
     .custom(asyncHandler(async (imageNumber: string, meta: typeof Meta ) => {
@@ -65,8 +65,9 @@ const validateGuess = [
 ];
 
 // Given a set of guessed coordinates and a particular image, check if the guess matches the image coordinates stored in the database
-async function gameboardGuessGet(req: Request, res: Response) {
-    const { coordinateXGuess, coordinateYGuess, imageNumber } = req.body;
+// Request needs to be typed in order for parseInt() to work on req.query variables - use generics (from https://stackoverflow.com/questions/63538665/how-to-type-request-query-in-express-using-typescript)
+async function gameboardGuessGet(req: Request<{ levelNumber: string }, unknown, unknown, { coordinateXGuess: string, coordinateYGuess: string, imageNumber: string }>, res: Response) {
+    const { coordinateXGuess, coordinateYGuess, imageNumber } = req.query;
     const { levelNumber } = req.params;
 
     const errors = validationResult(req);
@@ -106,8 +107,7 @@ async function gameboardGuessGet(req: Request, res: Response) {
         // Convert req.body variables into integers and check if user's guess fits within the given range
         let isGuessCorrect = false;
         let isGameComplete = false;
-        let remainingImages: number[] = [];
-
+        
         const coordinateXGuessNumber = parseInt(coordinateXGuess);
         const coordinateYGuessNumber = parseInt(coordinateYGuess);
         if((coordinateXGuessNumber >= image[0].coordinateX - GUESS_RANGE && coordinateXGuessNumber <= image[0].coordinateX + GUESS_RANGE) && (coordinateYGuessNumber >= image[0].coordinateY - GUESS_RANGE && coordinateYGuessNumber <= image[0].coordinateY + GUESS_RANGE))
@@ -122,7 +122,7 @@ async function gameboardGuessGet(req: Request, res: Response) {
                 {
                     req.session.correctlyGuessedImages = new Array(answerCount).fill(false);
                 }
-                req.session.correctlyGuessedImages[imageNumber-1] = true;
+                req.session.correctlyGuessedImages[parseInt(imageNumber)-1] = true; // all image numbers are 1-indexed, must subtract 1 as arrays are 0-indexed
 
                 // Win conditions: if all the level's images were found (marked as correctly guessed), record the time and inform user the game is complete
                 if(req.session.correctlyGuessedImages.length === answerCount && !req.session.correctlyGuessedImages.includes(false))
@@ -130,13 +130,6 @@ async function gameboardGuessGet(req: Request, res: Response) {
                     isGameComplete = true;
                     req.session.endTime = new Date();
                 }
-
-                // Record which images the user still must find to win the game
-                req.session.correctlyGuessedImages.forEach((imageNumber, index) => { 
-                    if(imageNumber === false) {
-                        remainingImages.push(index+1);
-                    }
-                });
             }
             else
             {
@@ -150,7 +143,7 @@ async function gameboardGuessGet(req: Request, res: Response) {
                         imageNumber: imageNumber,
                         isGuessCorrect: isGuessCorrect,
                         isGameComplete: null,
-                        remainingImages: null,
+                        isImageFoundList: [],
                     },
                 };
                 res.status(200).json(internalErrorData);
@@ -166,7 +159,7 @@ async function gameboardGuessGet(req: Request, res: Response) {
                 imageNumber: imageNumber,
                 isGuessCorrect: isGuessCorrect,
                 isGameComplete: isGameComplete,
-                remainingImages: (!isGameComplete && remainingImages.length === 0) ? null : remainingImages,
+                isImageFoundList: (req.session.correctlyGuessedImages) ? req.session.correctlyGuessedImages : [],
             },
         };
         res.status(200).json(validData);

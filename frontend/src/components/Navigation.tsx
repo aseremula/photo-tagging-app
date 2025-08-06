@@ -2,14 +2,14 @@ import { useContext } from 'react'
 import ImageIcon from './ImageIcon';
 import { LevelContext } from '../context/levelContext';
 
-function Navigation() {
+function Navigation({ imageSet } : { imageSet: boolean[] }) {
   const level = useContext(LevelContext);
-
+  
   const renderList = () => {
     const listItems = [];
     for (let imageCounter = 1; imageCounter <= level.numberOfImages; imageCounter++) {
       listItems.push(
-        <li key={imageCounter}><ImageIcon key={imageCounter} imagePath={`/${level.img}/${imageCounter}.jpg`} markAsFound={false} /></li>
+        <li key={imageCounter}><ImageIcon key={imageCounter} imagePath={`/${level.img}/${imageCounter}.jpg`} markAsFound={imageSet[imageCounter-1]} /></li>
       );
     }
     return listItems;
@@ -40,10 +40,10 @@ function Navigation() {
           <h1 className="text-5xl font-(family-name:--bodoni-400) italic text-(--black) lg:max-2xl:text-3xl">eFIND</h1> 
         </div>
             
-        <h2 className="text-lg lg:max-2xl:text-sm"><a href="https://www.eboy.com/products/san-francisco-poster">{level.title}</a></h2>
+        <h2 className="text-lg lg:max-2xl:text-sm">{level.title}</h2>
       </div>
     </nav>
   )
 }
 
-export default Navigation
+export default Navigation;

@@ -15,4 +15,4 @@ function ImageIcon({ imagePath="", markAsFound=false } : { imagePath: string, ma
   )
 }
 
-export default ImageIcon
+export default ImageIcon;

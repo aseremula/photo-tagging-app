@@ -95,7 +95,7 @@ function EndMenu({ setPlayState, levelNumber, numberOfScores, playerName }: { se
     }, [levelNumber, numberOfScores, playerName]);
 
   return (
-    <section className="min-w-115 max-w-115 font-(family-name:--roboto-400) text-(--black) text-xl bg-(--tan) border-1 border-(--aqua) border-dashed overflow-y-auto max-h-[78vh] lg:max-xl:text-lg xl:max-2xl:text-lg">
+    <section className="menuEnter min-w-115 max-w-115 font-(family-name:--roboto-400) text-(--black) text-xl bg-(--tan) border-1 border-(--aqua) border-dashed overflow-y-auto max-h-[78vh] lg:max-xl:text-lg xl:max-2xl:text-lg">
         <h3 className="font-(family-name:--bodoni-400) italic text-5xl text-(--light-red) p-3 py-6 bg-(--neon-yellow) border-b-(--aqua) border-b-1 border-dashed lg:max-xl:text-3xl lg:max-xl:py-4 xl:max-2xl:text-4xl xl:max-2xl:p-5">Results</h3>
        
         <div className="p-3">
@@ -132,22 +132,22 @@ function EndMenu({ setPlayState, levelNumber, numberOfScores, playerName }: { se
         :
             <div className="p-3">
                 <table className="table-auto border-collapse w-[100%]">
-                        <caption className="text-left font-bold text-(--gray)">Leaderboard</caption>
-                        <thead>
-                            <tr>
-                                <th scope="col" className="text-(--aqua) italic text-xs text-center px-3 pt-3">Position</th>
-                                <th scope="col" className="text-(--aqua) italic text-xs text-left px-3 pt-3">User</th>
-                                <th scope="col" className="text-(--aqua) italic text-xs text-left px-3 pt-3">Time</th>
-                            </tr>
-                        </thead>
-                        <tbody className="border-1 border-(--black)">
-                            {leaderboardInfo.leaderboardScores.scores.map((score, index) => (
-                            <tr key={score.id} className="odd:bg-white even:bg-(--off-white)">
-                                <th scope="row" className="p-3 text-center lg:max-xl:p-2">#{index+1}</th>
-                                <td className={`p-3 font-(family-name:--bodoni-400) hyphens-auto wrap-anywhere italic text-left w-[100%] lg:max-xl:p-2 ${score.id === leaderboardInfo.playerScore.id && "text-(--light-red)"}`}>{score.name}</td>
-                                <td className={`p-3 text-right lg:max-xl:p-2 ${score.id === leaderboardInfo.playerScore.id && "text-(--light-red)"}`}>{score.time}</td>
-                            </tr>))}
-                        </tbody>
+                    <caption className="text-left font-bold text-(--gray)">Leaderboard</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col" className="text-(--aqua) italic text-xs text-center px-3 pt-3">Position</th>
+                            <th scope="col" className="text-(--aqua) italic text-xs text-left px-3 pt-3">User</th>
+                            <th scope="col" className="text-(--aqua) italic text-xs text-left px-3 pt-3">Time</th>
+                        </tr>
+                    </thead>
+                    <tbody className="border-1 border-(--black)">
+                        {leaderboardInfo.leaderboardScores.scores.map((score, index) => (
+                        <tr key={score.id} className="odd:bg-white even:bg-(--off-white)">
+                            <th scope="row" className="p-3 text-center lg:max-xl:p-2">#{index+1}</th>
+                            <td className={`p-3 font-(family-name:--bodoni-400) hyphens-auto wrap-anywhere italic text-left w-[100%] lg:max-xl:p-2 ${score.id === leaderboardInfo.playerScore.id && "text-(--light-red)"}`}>{score.name}</td>
+                            <td className={`p-3 text-right lg:max-xl:p-2 ${score.id === leaderboardInfo.playerScore.id && "text-(--light-red)"}`}>{score.time}</td>
+                        </tr>))}
+                    </tbody>
                 </table>
             </div>)
         }

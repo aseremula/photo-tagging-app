@@ -45,11 +45,6 @@ async function leaderboardPost(req: Request, res: Response) {
     const { levelNumber } = req.body;
     const { numberOfScores } = req.query;
 
-    // TODO: remove next 3 lines when done testing menus
-    console.log(req.session.startTime);
-    console.log(req.session.endTime);
-    req.session.endTime = new Date();
-
     // Get the number of images needed to win the level
     const answerCount = await prisma.answer.count({
         where: {
@@ -73,17 +68,17 @@ async function leaderboardPost(req: Request, res: Response) {
         
         res.status(200).json(invalidData);
     }
-    // else if(!req.session.correctlyGuessedImages || (req.session.correctlyGuessedImages && (req.session.correctlyGuessedImages.length !== answerCount || req.session.correctlyGuessedImages.includes(false))))
-    // {
-    //     const incompleteGameData = {
-    //         outcome: outcomes.FAILURE,
-    //         title: "Leaderboard POST Failure",
-    //         description: "POSTing to the leaderboard failed because the game is not complete yet. Find all the images first!",
-    //         data: {},
-    //     };
+    else if(!req.session.correctlyGuessedImages || (req.session.correctlyGuessedImages && (req.session.correctlyGuessedImages.length !== answerCount || req.session.correctlyGuessedImages.includes(false))))
+    {
+        const incompleteGameData = {
+            outcome: outcomes.FAILURE,
+            title: "Leaderboard POST Failure",
+            description: "POSTing to the leaderboard failed because the game is not complete yet. Find all the images first!",
+            data: {},
+        };
         
-    //     res.status(200).json(incompleteGameData);
-    // }
+        res.status(200).json(incompleteGameData);
+    }
     else
     {
         // Grab name from session data. In case the name does not exist, use "Player" instead
@@ -138,7 +133,6 @@ async function leaderboardPost(req: Request, res: Response) {
                     orderBy: {
                         time: 'asc', // smallest to largest times
                     },
-
                 },
             },
         });

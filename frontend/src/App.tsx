@@ -13,9 +13,9 @@ function App() {
   const [compatibility, setCompatibility] = useState<DeviceCompatibility>("loading");
   const [level, setLevel] = useState<LevelContextType>({ img: "san_francisco", title: "San Francisco", numberOfImages: 5, levelNumber: 1 });
 
-  const [imageSet, setImageSet] = useState(() => new Set([]));
-  const [playState, setPlayState] = useState<playStates>("end_menu");
-  const [correctGuessCoordinates, setCorrectGuessCoordinates] = useState([{ pageX: 646, pageY: 248, standardX: 5583, standardY: 3026 }]);
+  const [imageSet, setImageSet] = useState<boolean[]>([]);
+  const [playState, setPlayState] = useState<playStates>("start_menu");
+  const [correctGuessCoordinates, setCorrectGuessCoordinates] = useState<Coordinates[]>([]);
   const [playerName, setPlayerName] = useState("Player");
 
   useEffect(() => {
@@ -23,6 +23,19 @@ function App() {
     window.addEventListener("resize", isDeviceCompatible);
     return () => window.removeEventListener("resize", isDeviceCompatible);
   }, []);
+
+  useEffect(() => {
+    // after the user finishes the game, remove the markers so a new game can be played 
+    if(playState === "end_menu")
+    {
+      setCorrectGuessCoordinates([]);
+    }
+
+    if(playState === "start_menu")
+    {
+      setImageSet([]);
+    }
+  }, [playState]);
 
   function isDeviceCompatible()
   {
@@ -57,9 +70,9 @@ function App() {
               </div>
             }
 
-            <div className="p-5 bg-(--off-white) flex flex-col justify-center gap-5 overflow-x-hidden">
-              <Navigation/>
-              <Gameboard imageSet={imageSet} playState={playState} correctGuessCoordinates={correctGuessCoordinates} setCorrectGuessCoordinates={setCorrectGuessCoordinates}/>
+            <div className="fadeIn p-5 bg-(--off-white) flex flex-col justify-center gap-5 overflow-x-hidden">
+              <Navigation imageSet={imageSet}/>
+              <Gameboard imageSet={imageSet} setImageSet={setImageSet} playState={playState} setPlayState={setPlayState} correctGuessCoordinates={correctGuessCoordinates} setCorrectGuessCoordinates={setCorrectGuessCoordinates}/>
             </div>
           </main> 
         </LevelContext.Provider>
@@ -103,4 +116,4 @@ function App() {
   )
 }
 
-export default App
+export default App;

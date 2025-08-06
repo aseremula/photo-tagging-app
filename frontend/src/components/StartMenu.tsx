@@ -55,8 +55,8 @@ function StartMenu({ setPlayState, playerName, setPlayerName } : { setPlayState:
         };
     
         const name = e.currentTarget.elements.name.value;
-        const path = "https://efind-qk5v.onrender.com/names";
-        // const path = "http://localhost:3003/names";
+        // const path = "https://efind-qk5v.onrender.com/names";
+        const path = "http://localhost:3003/names";
         const method = "POST";
         const body = { 
             name: name, 
@@ -79,7 +79,6 @@ function StartMenu({ setPlayState, playerName, setPlayerName } : { setPlayState:
             {
                 // TODO: Close modal, show image, and start timer
                 setPlayState("gameboard_guessing");
-                // setPlayState("end_menu");
                 setPlayerName(name);
             } 
             setFormErrors(newFormErrors);
@@ -132,7 +131,7 @@ function StartMenu({ setPlayState, playerName, setPlayerName } : { setPlayState:
     }
 
   return (
-    <section className="min-w-115 max-w-115 font-(family-name:--roboto-400) text-(--black) text-xl bg-(--tan) border-1 border-(--aqua) border-dashed pb-3 lg:max-xl:text-base xl:max-2xl:text-lg">
+    <section className="menuEnter min-w-115 max-w-115 font-(family-name:--roboto-400) text-(--black) text-xl bg-(--tan) border-1 border-(--aqua) border-dashed pb-3 lg:max-xl:text-base xl:max-2xl:text-lg">
         <h3 className="font-(family-name:--bodoni-400) italic text-5xl text-(--light-red) p-3 py-6 bg-(--neon-yellow) border-b-(--aqua) border-b-1 border-dashed lg:max-xl:text-3xl lg:max-xl:py-4 xl:max-2xl:text-4xl xl:max-2xl:p-5">Instructions</h3>
         <p className="p-3">Can you find these 5 people scattered throughout eBoy's <span className="text-(--aqua) font-bold">{level.title}</span> pixorama? Find and click them fast enough and you may even appear on the leaderboard!</p>
 

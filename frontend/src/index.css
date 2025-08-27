@@ -86,7 +86,7 @@ input:is(:-webkit-autofill, :autofill) {
 }
 
 @media (prefers-reduced-motion) {
-  .loadingScreenText, .svgEnter, .appear, .loadingScreenIcon, .markerEnter, .menuEnter, .fadeIn {
+  .loadingScreenText, .svgEnter, .appear, .loadingScreenIcon, .markerEnter, .menuEnter, .fadeIn, .overtimeText {
     animation: none;
   }
 }
@@ -291,4 +291,20 @@ input:is(:-webkit-autofill, :autofill) {
   animation-iteration-count: 1;
   animation-direction: normal;
   animation-timing-function: ease;
+}
+
+.overtimeText {
+  animation-name: overtimeText;
+  animation-duration: 0.8s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate-reverse;
+  animation-timing-function: ease;
+}
+
+@keyframes overtimeText
+{
+  100%
+  {
+    color: var(--light-red);
+  }
 }

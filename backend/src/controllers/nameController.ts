@@ -1,5 +1,6 @@
 require("dotenv").config();
 import { Request, Response } from 'express';
+import { getTime } from "date-fns";
 const { body, validationResult } = require("express-validator");
 
 const alphaErr = "can only contain letters.";
@@ -10,6 +11,7 @@ const outcomes = {
     FAILURE: "FAILURE",
 };
 
+// To be valid, a name must be between 1 and 30 characters and only contain alpha characters. Spaces are also allowed.
 const validateName = [   
     body("name").trim().escape()
     .not().isEmpty().withMessage({category: "name", description: `Name ${requiredErr}`}).bail()
@@ -17,7 +19,7 @@ const validateName = [
     .isLength({ min: 1, max: 30 }).withMessage({category: "name", description: `Name ${nonoptional_name_lengthErr}`}).bail(),
 ];
 
-// Check if the name submitted is valid to use in leaderboard
+// Check if the name submitted is valid to use in leaderboard. If it is, start the game by activating the timer
 async function namePost(req: Request, res: Response) {
     const { name } = req.body;
 
@@ -31,6 +33,7 @@ async function namePost(req: Request, res: Response) {
             data: {
                 isValidName: false,
                 name: name,
+                startTime: 0,
                 errors: errors.array(),
             },
         };
@@ -44,6 +47,11 @@ async function namePost(req: Request, res: Response) {
     }
     else
     {
+        // If the user's suggested name passes, use it for session data, begin the timer by recording the current time, and declare a set to track the user's correctly guessed images
+        req.session.name = name;
+        req.session.startTime = new Date();
+        req.session.correctlyGuessedImages = [];
+
         const validData = {
             outcome: outcomes.SUCCESS,
             title: "Validation Check Success",
@@ -51,13 +59,9 @@ async function namePost(req: Request, res: Response) {
             data: {
                 isValidName: true,
                 name: name,
+                startTime: getTime(req.session.startTime),
             },
         };
-
-        // If the user's suggested name passes, use it for session data, begin the timer by recording the current time, and declare a set to track the user's correctly guessed images
-        req.session.name = name;
-        req.session.startTime = new Date();
-        req.session.correctlyGuessedImages = [];
 
         // Send status 202: Accepted
         res.status(202).json(validData);

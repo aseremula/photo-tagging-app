@@ -12,7 +12,7 @@ interface guessedImageState {
 
 function Dropdown({ imageSet, setImageSet, bubbleDirection, setPlayState, setShowDropdown, dropdownTimeoutRef, coordinates, correctGuessCoordinates, setCorrectGuessCoordinates } : { imageSet: boolean[], setImageSet: Dispatch<SetStateAction<boolean[]>>, bubbleDirection: BubbleDirection, setPlayState: Dispatch<SetStateAction<playStates>>, setShowDropdown: Dispatch<SetStateAction<boolean>>, dropdownTimeoutRef: RefObject<ReturnType<typeof setTimeout>>, coordinates: Coordinates, correctGuessCoordinates: Coordinates[], setCorrectGuessCoordinates: Dispatch<SetStateAction<Coordinates[]>>}) {
   const [guessedImage, setGuessedImage] = useState<guessedImageState>({imagePosition: 0, result: "waiting"});
-  const level = useContext(LevelContext);
+  const levelContext = useContext(LevelContext);
 
   async function handleClick(e: MouseEvent<HTMLElement>, imagePosition: ImagePosition)
   {
@@ -24,7 +24,7 @@ function Dropdown({ imageSet, setImageSet, bubbleDirection, setPlayState, setSho
     };
   
     // const path = `https://efind-qk5v.onrender.com/gameboards/${level.levelNumber}/guess`; // TODO: change link to match localhost's
-    const path = `http://localhost:3003/gameboards/${level.levelNumber}/guess?coordinateXGuess=${coordinates.standardX}&coordinateYGuess=${coordinates.standardY}&imageNumber=${imagePosition}`;
+    const path = `http://localhost:3003/gameboards/${levelContext.levelInfo.levelNumber}/guess?coordinateXGuess=${coordinates.standardX}&coordinateYGuess=${coordinates.standardY}&imageNumber=${imagePosition}`;
     const method = "GET";
 
     const response = await getApiResponse(path, method);  
@@ -36,23 +36,17 @@ function Dropdown({ imageSet, setImageSet, bubbleDirection, setPlayState, setSho
       }
       else if(response.outcome === outcomes.SUCCESS)
       {
-        console.log(response.data);
         if(response.data.isGuessCorrect)
         {
           setGuessedImage({...guessedImage, imagePosition: imagePosition, result: "correct"});
           setImageSet(response.data.isImageFoundList);
           
           // If guess correct, place marker
-          setTimeout(() => {
-            // if the marker is placed right away, the user does not have enough time to see the correct image being checkmarked as state is updated. Pause for a moment before adding marker
-            setCorrectGuessCoordinates([...correctGuessCoordinates, coordinates]);
-          }, 1100);
-
+          setCorrectGuessCoordinates([...correctGuessCoordinates, coordinates]);
+          
           if(response.data.isGameComplete)
           {
-            setTimeout(() => {
-              setPlayState("end_menu");
-            }, 1500);  
+            setPlayState("end_menu");  
           }
         }
         else
@@ -115,7 +109,7 @@ function Dropdown({ imageSet, setImageSet, bubbleDirection, setPlayState, setSho
 
   const renderList = () => {
     const listItems = [];
-    for (let imageCounter = 1; imageCounter <= level.numberOfImages; imageCounter++) {
+    for (let imageCounter = 1; imageCounter <= levelContext.levelInfo.numberOfImages; imageCounter++) {
       listItems.push(
         <li key={imageCounter} className="flex items-center justify-center">
           <button type="button" className={`cursor-${(guessedImage.result === "correct" || imageSet[imageCounter-1]) ? "default" : "pointer"} relative ${(guessedImage.imagePosition === 0 || guessedImage.imagePosition === imageCounter || guessedImage.result !== "waiting" || imageSet[imageCounter-1]) ? "opacity-100" : "opacity-50"}`} onMouseEnter={() => (setGuessedImage({...guessedImage, imagePosition: imageCounter as ImagePosition, result: "waiting"}))} onClick={(e) => handleClick(e, imageCounter as ImagePosition)} disabled={(guessedImage.result === "correct" || imageSet[imageCounter-1]) ? true : false} aria-label={`Guess image ${imageCounter} is located here`}>
@@ -130,7 +124,7 @@ function Dropdown({ imageSet, setImageSet, bubbleDirection, setPlayState, setSho
 
             {/* Set opacity and grayscale for the image the user clicked - as long as it's not correct (correct images have their own opacity and grayscale in ImageIcon) or in waiting */}
             <span className={`pointer-events-none ${(guessedImage.imagePosition === imageCounter && guessedImage.result !== "waiting" && guessedImage.result !== "correct") && "grayscale opacity-20"}`}>
-              <ImageIcon key={imageCounter} imagePath={`/${level.img}/${imageCounter}.jpg`} markAsFound={imageSet[imageCounter-1]} />
+              <ImageIcon key={imageCounter} imagePath={`/${levelContext.levelInfo.img}/${imageCounter}.jpg`} markAsFound={imageSet[imageCounter-1]} />
             </span>
           </button>
         </li>

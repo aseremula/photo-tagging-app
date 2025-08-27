@@ -15,7 +15,7 @@ function Gameboard({ imageSet, setImageSet, playState, setPlayState, correctGues
   const [dropdownCoordinates, setDropdownCoordinates] = useState<dropdownCoordinatesState>({ top: -65, left: 2, bubbleDirection: "bottom" });
   const [coordinates, setCoordinates] = useState({ pageX: 0, pageY: 0, standardX: 0, standardY: 0 });
   const dropdownTimeoutRef = useRef(0);
-  const level = useContext(LevelContext);
+  const levelContext = useContext(LevelContext);
   const STANDARDIZED_IMAGE_SIZE = 10000; // provides standardized coordinates on a n x n gameboard across all devices
 
   // When user correctly guesses an image, place a marker on that image in the gameboard. Reposition the marker if the user's screen size changes
@@ -115,7 +115,7 @@ function Gameboard({ imageSet, setImageSet, playState, setPlayState, correctGues
       top: coordinates.pageY + dropdownCoordinates.top,
       transform: "translateX(-50%) translateY(-50%)",
       }} className="z-2">
-        {/* The key is only used for refreshing the dropdown on touchscreens - if the user guesses correctly and clicks other spots of the image immediately, return the dropdown to its inital state */}
+        {/* The key is only used for refreshing the dropdown on touchscreens - if the user guesses correctly and clicks other spots of the image immediately, return the dropdown to its initial state */}
         {(showDropdown && (playState === "gameboard_guessing")) && <span className="appear" key={`${coordinates.standardX}-${coordinates.standardY}`} onMouseEnter={() => {
         setShowDropdown(true);
         clearTimeout(dropdownTimeoutRef.current); // do not close the dropdown while the user's mouse moves around the component
@@ -135,7 +135,7 @@ function Gameboard({ imageSet, setImageSet, playState, setPlayState, correctGues
 
       <div ref={imageRef} onClick={(e) => handleClick(e)} className={`hover:cursor-crosshair ${(playState !== "gameboard_guessing") && "pointer-events-none"}`}>
         {/* Add blur to image before game begins to prevent users from searching for images before starting the timer (cheating) */}
-        <img className={`pointer-events-none ${(playState !== "gameboard_guessing") && "blur-sm grayscale"}`} src={`/${level.img}/image.png`} width="auto" height="auto" alt={`A pixorama of ${level.title} by eBoy`}/>
+        <img className={`pointer-events-none ${(playState !== "gameboard_guessing") && "blur-sm grayscale"}`} src={`/${levelContext.levelInfo.img}/image.png`} width="auto" height="auto" alt={`A pixorama of ${levelContext.levelInfo.title} by eBoy`}/>
       </div>
     </section>
   )

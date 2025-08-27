@@ -40,7 +40,8 @@ model Leaderboard {
 model Score {
   id            String      @id @default(uuid())
   name          String      @db.VarChar(255)
-  time          String
+  time          Int
+  createdAt     DateTime    @default(now())
   leaderboard   Leaderboard @relation(fields: [leaderboardId], references: [id], onDelete: Cascade)
   leaderboardId Int
 }

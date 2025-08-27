@@ -34,7 +34,6 @@ async function loadLevels()
 
 async function main() {
     const deleteLevels = await prisma.level.deleteMany({});
-
     loadLevels();
 
     // To test if levels/answers are present and accurate:

@@ -4,9 +4,9 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const { body, query, validationResult } = require("express-validator");
 const asyncHandler = require("express-async-handler");
-const { differenceInMilliseconds, format } = require("date-fns");
+const { differenceInMilliseconds } = require("date-fns");
 
-type Score = { id: string, name: string, time: string, leaderboardId: number };
+type Score = { id: string, name: string, time: number, leaderboardId: number };
 
 const intRangeErr = "must be an integer between greater than 0 and less than 25.";
 const intErr = "must be an integer.";
@@ -88,16 +88,16 @@ async function leaderboardPost(req: Request, res: Response) {
             leaderboardName = req.session.name;
         }
 
-        // Get start and end time from session data. If the start/end time does not exist, use the max time instead. Otherwise, calculate the difference between the start and end times in milliseconds and format it as minutes:seconds.milliseconds
-        let leaderboardTime = "59:59.99"; // minutes:seconds.milliseconds
-        const MAX_TIME_MILLISECONDS = 3599990; // leaderboardTime variable in milliseconds
-    
+        // Get start and end time from session data. If the start/end time does not exist, use the max time instead. Otherwise, calculate the difference between the start and end times in milliseconds
+        const MAX_TIME_MILLISECONDS = 3599990; // "59:59.99" in milliseconds (minutes:seconds.milliseconds)
+        let leaderboardTime = MAX_TIME_MILLISECONDS;
+
         if(req.session.startTime && req.session.endTime)
         {
             const diffMilliseconds = differenceInMilliseconds(req.session.endTime, req.session.startTime);
             if(diffMilliseconds < MAX_TIME_MILLISECONDS)
             {
-                leaderboardTime = format(diffMilliseconds, "m:ss.SS");
+                leaderboardTime = diffMilliseconds;
             }
             req.session.startTime = undefined; // prevent a user from submitting multiple scores that may rank in the leaderboard during a single game. The user must start a new game to begin the timer once more
             req.session.endTime = undefined;
@@ -114,7 +114,7 @@ async function leaderboardPost(req: Request, res: Response) {
             },
         });
 
-        // Create a score for the player
+        // Create a score for the player using their recorded name and time
         const playerScore = await prisma.score.create({
             data: {
                 name: leaderboardName,
@@ -123,20 +123,24 @@ async function leaderboardPost(req: Request, res: Response) {
             },
         });
 
-        // With this new score added to the level's leaderboard, grab all players from the leaderboard
+        // With this new score added to the level's leaderboard, grab all players from the db as they would appear on the leaderboard
         const allLeaderboardScores = await prisma.leaderboard.findUnique({
             where: {
                 id: level.leaderboard.id,
             },
             include: {
                 scores: {
-                    orderBy: {
+                    orderBy: [{
                         time: 'asc', // smallest to largest times
                     },
+                    {
+                        createdAt: 'asc', // if two times are the same, the older times come before newer ones
+                    },
+                    ],
                 },
             },
         });
-        
+
         const leaderboardScores = allLeaderboardScores;
 
         // Determine the rank of the user and if their score is in the current top X high scores. To prevent calling the database a second time, keep X high scores when iterating through all scores

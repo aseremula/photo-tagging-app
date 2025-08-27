@@ -5,18 +5,29 @@ import StartMenu from './components/StartMenu';
 import EndMenu from './components/EndMenu';
 import { LevelContext } from './context/levelContext';
 import type { LevelContextType } from './context/levelContext';
+import Stopwatch from './components/Stopwatch';
 
 type DeviceCompatibility = "compatible" | "rotate" | "incompatible" | "unknown" | "loading";
 
 function App() {
   const WIDTH_BREAKPOINT = 592; // only support responsive design for devices with this screen width in pixels or higher due to using such a wide/detailed image
   const [compatibility, setCompatibility] = useState<DeviceCompatibility>("loading");
-  const [level, setLevel] = useState<LevelContextType>({ img: "san_francisco", title: "San Francisco", numberOfImages: 5, levelNumber: 1 });
+  const [levelContext, ] = useState<LevelContextType>({ // Since we are not using setLevelContext, remove the linting error via destructuring
+    levelInfo: { 
+      img: "san_francisco", 
+      title: "San Francisco",
+      numberOfImages: 5, 
+      levelNumber: 1 
+    }
+});
 
   const [imageSet, setImageSet] = useState<boolean[]>([]);
   const [playState, setPlayState] = useState<playStates>("start_menu");
   const [correctGuessCoordinates, setCorrectGuessCoordinates] = useState<Coordinates[]>([]);
   const [playerName, setPlayerName] = useState("Player");
+  const [stopwatchStatus, setStopwatchStatus] = useState<StopwatchStatus>("off");
+  const [startTime, setStartTime] = useState(0);
+  const [endTime, setEndTime] = useState(0);
 
   useEffect(() => {
     isDeviceCompatible(); // for initial load of app
@@ -25,15 +36,22 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // after the user finishes the game, remove the markers so a new game can be played 
+    // after the user finishes the game, remove the markers and reset stopwatch so a new game can be played 
     if(playState === "end_menu")
     {
-      setCorrectGuessCoordinates([]);
+      setCorrectGuessCoordinates([]); // clear the checkmarks on the gameboard
+      setStopwatchStatus("text");
+    }
+
+    if(playState === "gameboard_guessing")
+    {
+      setStopwatchStatus("on");
     }
 
     if(playState === "start_menu")
     {
       setImageSet([]);
+      setStopwatchStatus("reset");
     }
   }, [playState]);
 
@@ -61,17 +79,19 @@ function App() {
   return (
     <div>
       {(compatibility === "compatible") ? 
-        <LevelContext.Provider value={level}>
+        <LevelContext.Provider value={levelContext}>
           <main className="relative">
             {/* When either menu is open, gameboard does not accept clicks. However, the navigation still does! */}
             {(playState === "start_menu" || playState === "end_menu") && 
               <div className="z-1 fixed bg-black/50 min-h-[100%] w-[100%] flex items-center justify-center">
-                {(playState === "start_menu") ? <StartMenu setPlayState={setPlayState} playerName={playerName} setPlayerName={setPlayerName}/> : <EndMenu setPlayState={setPlayState} levelNumber={level.levelNumber} numberOfScores={5} playerName={playerName}/>}
+                {(playState === "start_menu") ? <StartMenu setPlayState={setPlayState} playerName={playerName} setPlayerName={setPlayerName} setStartTime={setStartTime}/> : <EndMenu setPlayState={setPlayState} levelNumber={levelContext.levelInfo.levelNumber} numberOfScores={5} playerName={playerName} endTime={endTime} setEndTime={setEndTime}/>}
               </div>
             }
 
             <div className="fadeIn p-5 bg-(--off-white) flex flex-col justify-center gap-5 overflow-x-hidden">
-              <Navigation imageSet={imageSet}/>
+              <Navigation imageSet={imageSet}>
+                <Stopwatch startTime={startTime} endTime={endTime} setEndTime={newEndTime => setEndTime(newEndTime)} stopwatchStatus={stopwatchStatus} setStopwatchStatus={newStopwatchStatus => setStopwatchStatus(newStopwatchStatus)}/>
+              </Navigation>
               <Gameboard imageSet={imageSet} setImageSet={setImageSet} playState={playState} setPlayState={setPlayState} correctGuessCoordinates={correctGuessCoordinates} setCorrectGuessCoordinates={setCorrectGuessCoordinates}/>
             </div>
           </main> 

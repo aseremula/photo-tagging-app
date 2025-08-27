@@ -1,15 +1,21 @@
-import { useContext } from 'react'
+import { useContext } from 'react';
+import type { PropsWithChildren } from 'react';
 import ImageIcon from './ImageIcon';
 import { LevelContext } from '../context/levelContext';
 
-function Navigation({ imageSet } : { imageSet: boolean[] }) {
-  const level = useContext(LevelContext);
+type NavigationComponentProps = {
+  imageSet: boolean[];
+}
+
+// Ensure proper typing of the children prop by using PropsWithChildren
+function Navigation({ imageSet, children } : PropsWithChildren<NavigationComponentProps>) {
+  const levelContext = useContext(LevelContext);
   
   const renderList = () => {
     const listItems = [];
-    for (let imageCounter = 1; imageCounter <= level.numberOfImages; imageCounter++) {
+    for (let imageCounter = 1; imageCounter <= levelContext.levelInfo.numberOfImages; imageCounter++) {
       listItems.push(
-        <li key={imageCounter}><ImageIcon key={imageCounter} imagePath={`/${level.img}/${imageCounter}.jpg`} markAsFound={imageSet[imageCounter-1]} /></li>
+        <li key={imageCounter}><ImageIcon key={imageCounter} imagePath={`/${levelContext.levelInfo.img}/${imageCounter}.jpg`} markAsFound={imageSet[imageCounter-1]} /></li>
       );
     }
     return listItems;
@@ -28,10 +34,9 @@ function Navigation({ imageSet } : { imageSet: boolean[] }) {
         </ul>
       </div>
 
-      {/* TODO: insert time */}
-      <div className="flex items-center justify-center gap-2 text-5xl text-(--neon-yellow) bg-(--aqua) p-3 lg:max-xl:text-[26px] xl:max-2xl:text-3xl">
-        <svg className="min-w-10 min-h-10 max-w-13 max-h-13 fill-(--neon-yellow) pointer-events-none lg:max-2xl:w-10 lg:max-2xl:h-10" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M480-132q-64 0-120-24t-98-66q-42-42-66-98t-24-120q0-64 24-120t66-98q42-42 98-66t120-24q64 0 120 24t98 66q42 42 66 98t24 120q0 64-24 120t-66 98q-42 42-98 66t-120 24Zm0-308Zm130 150 20-20-136-136v-194h-28v206l144 144ZM240-810l20 20-130 130-20-20 130-130Zm480 0 130 130-20 20-130-130 20-20ZM480-160q116 0 198-82t82-198q0-116-82-198t-198-82q-116 0-198 82t-82 198q0 116 82 198t198 82Z"/></svg>
-        <p className="font-(family-name:--bodoni-400) italic">00:00:00</p>
+      {/* Using composition to include Stopwatch component */}
+      <div className="font-(family-name:--bodoni-400) italic flex items-center justify-center gap-2 text-5xl text-(--neon-yellow) bg-(--aqua) p-3 lg:max-xl:text-[26px] xl:max-2xl:text-3xl">
+        {children}
       </div>
         
       <div className="flex flex-col items-end justify-center p-3">
@@ -40,7 +45,7 @@ function Navigation({ imageSet } : { imageSet: boolean[] }) {
           <h1 className="text-5xl font-(family-name:--bodoni-400) italic text-(--black) lg:max-2xl:text-3xl">eFIND</h1> 
         </div>
             
-        <h2 className="text-lg lg:max-2xl:text-sm">{level.title}</h2>
+        <h2 className="text-lg lg:max-2xl:text-sm">{levelContext.levelInfo.title}</h2>
       </div>
     </nav>
   )

@@ -28,8 +28,8 @@ interface formErrors {
    [key: string]: apiErrorResponse | null;
 };
 
-function StartMenu({ setPlayState, playerName, setPlayerName } : { setPlayState: Dispatch<SetStateAction<playStates>>, playerName: string, setPlayerName: Dispatch<SetStateAction<string>> }) {
-    const level = useContext(LevelContext);
+function StartMenu({ setPlayState, playerName, setPlayerName, setStartTime } : { setPlayState: Dispatch<SetStateAction<playStates>>, playerName: string, setPlayerName: Dispatch<SetStateAction<string>>, setStartTime: Dispatch<SetStateAction<number>> }) {
+    const levelContext = useContext(LevelContext);
 
     const [formData, setFormData] = useState({
         name: playerName,
@@ -54,6 +54,7 @@ function StartMenu({ setPlayState, playerName, setPlayerName } : { setPlayState:
             name: null,
         };
     
+        // TODO: change from localhost to render link
         const name = e.currentTarget.elements.name.value;
         // const path = "https://efind-qk5v.onrender.com/names";
         const path = "http://localhost:3003/names";
@@ -77,9 +78,10 @@ function StartMenu({ setPlayState, playerName, setPlayerName } : { setPlayState:
             }
             else if(response.outcome === outcomes.SUCCESS)
             {
-                // TODO: Close modal, show image, and start timer
+                // Close modal, show image, and start timer
                 setPlayState("gameboard_guessing");
                 setPlayerName(name);
+                setStartTime(response.data.startTime);
             } 
             setFormErrors(newFormErrors);
         }  
@@ -133,7 +135,7 @@ function StartMenu({ setPlayState, playerName, setPlayerName } : { setPlayState:
   return (
     <section className="menuEnter min-w-115 max-w-115 font-(family-name:--roboto-400) text-(--black) text-xl bg-(--tan) border-1 border-(--aqua) border-dashed pb-3 lg:max-xl:text-base xl:max-2xl:text-lg">
         <h3 className="font-(family-name:--bodoni-400) italic text-5xl text-(--light-red) p-3 py-6 bg-(--neon-yellow) border-b-(--aqua) border-b-1 border-dashed lg:max-xl:text-3xl lg:max-xl:py-4 xl:max-2xl:text-4xl xl:max-2xl:p-5">Instructions</h3>
-        <p className="p-3">Can you find these 5 people scattered throughout eBoy's <span className="text-(--aqua) font-bold">{level.title}</span> pixorama? Find and click them fast enough and you may even appear on the leaderboard!</p>
+        <p className="p-3">Can you find these 5 people scattered throughout eBoy's <span className="text-(--aqua) font-bold">{levelContext.levelInfo.title}</span> pixorama? Find and click them fast enough and you may even appear on the leaderboard!</p>
 
         <div className="bg-(--aqua) ml-3 mr-3 mt-3 text-base text-(--white) p-3">
             <div className="flex items-center gap-1">
@@ -154,7 +156,7 @@ function StartMenu({ setPlayState, playerName, setPlayerName } : { setPlayState:
                     }}/>
                 </div>
                 
-                {/* TODO: clicking button submits form and if name passes, starts gameplay and timer */}
+                {/* Clicking the start button submits form and if name passes backend validation, begins gameplay and timer */}
                 {(isLoading) ?
                     <p className="font-bold text-(--gray) loadingScreenText">Loading...</p> 
                     :

@@ -1,6 +1,7 @@
 import { useState, useContext, type FormEvent } from 'react';
-import type { Dispatch, SetStateAction } from 'react';
 import { LevelContext } from '../context/levelContext';
+import type { PlayState } from '../types/customTypes';
+import { fetchApi, type AvailableMethods, type HostType } from '../functions/fetchApi';
 
 // From: https://www.epicreact.dev/how-to-type-a-react-form-on-submit-handler
 // Tell Typescript directly the types of elements present in the form
@@ -13,7 +14,7 @@ interface NameFormElement extends HTMLFormElement {
     readonly elements: FormElements
 }
 
-type apiErrorResponse = {
+type ApiErrorResponse = {
     location: string;
     msg: {
         category: string;
@@ -24,51 +25,60 @@ type apiErrorResponse = {
     value: string;
 }
 
-interface formErrors {
-   [key: string]: apiErrorResponse | null;
+interface FormErrors {
+   [key: string]: ApiErrorResponse | null;
 };
 
-function StartMenu({ setPlayState, playerName, setPlayerName, setStartTime } : { setPlayState: Dispatch<SetStateAction<playStates>>, playerName: string, setPlayerName: Dispatch<SetStateAction<string>>, setStartTime: Dispatch<SetStateAction<number>> }) {
+type StartMenuComponentProps = {
+    setPlayState: (newPlayState: PlayState) => void;
+    playerName: string;
+    setPlayerName: (newPlayerName: string) => void;
+    setStartTime: (newStartTime: number) => void;
+}
+
+function StartMenu({ setPlayState, playerName, setPlayerName, setStartTime } : StartMenuComponentProps) {
     const levelContext = useContext(LevelContext);
 
     const [formData, setFormData] = useState({
         name: playerName,
     });
 
-    const [formErrors, setFormErrors] = useState<formErrors>({
+    const [formErrors, setFormErrors] = useState<FormErrors>({
         name: null,
     });
     const [isLoading, setIsLoading] = useState(false);
+    const [submitCount, setSubmitCount] = useState(0); // only used as a key for the form input - when the user enters a non-valid name, the key must be refreshed so the shake animation plays on the input element
 
     async function handleStartForm(e: FormEvent<NameFormElement>)
     {
         e.preventDefault();
         setIsLoading(true);
+        setSubmitCount(submitCount+1);
         const outcomes = {
             SUCCESS: "SUCCESS",
             FAILURE: "FAILURE",
         };
 
         // Remove previous form errors before showing new ones (if any exist)
-        const newFormErrors: formErrors = {
+        const newFormErrors: FormErrors = {
             name: null,
         };
     
-        // TODO: change from localhost to render link
+        // TODO: change to web when done testing
         const name = e.currentTarget.elements.name.value;
-        // const path = "https://efind-qk5v.onrender.com/names";
-        const path = "http://localhost:3003/names";
-        const method = "POST";
+        const hostType: HostType = "local";
+        const path = "/names";
+        const method: AvailableMethods = "POST";
         const body = { 
             name: name, 
         };
 
-        const response = await getApiResponse(path, method, body);  
+        const response = await fetchApi(hostType, path, method, body); 
         if(response)
         {
             if(response.outcome === outcomes.FAILURE)
             {
-                response.data.errors.forEach((error: apiErrorResponse) => {
+                response.data.errors.forEach((error: ApiErrorResponse) => {
                     if(error.msg.category === "name")
                     {
                         newFormErrors.name = error;
@@ -92,46 +102,6 @@ function StartMenu({ setPlayState, playerName, setPlayerName, setStartTime } : {
         setIsLoading(false); 
     }
 
-    async function getApiResponse(path: string, method: string, body: object) 
-    {
-        try
-        {
-            const headers = {
-                'Content-Type': 'application/json'
-            };
-
-            const response = await fetch(path, {
-                mode: 'cors', 
-                method: method, 
-                headers: headers,
-                credentials: 'include', // must add this when using cookies so credentials (cookies) are sent with request to server 
-                body: JSON.stringify(body),
-            });
-
-            if(!response.ok)
-            {
-                throw new Error(`Response status: ${response.status}`);
-            }
-            else
-            {
-                const APIData = await response.json();
-                return APIData;
-            }
-        }
-        catch(error)
-        {
-            // As anything (unknown) can be thrown, use a type guard to narrow down the type of error before accessing the message property
-            if(error instanceof Error) 
-            {
-                console.error(error.message);
-            }
-            else
-            {
-                console.error(error);
-            }
-        }
-    }
-
   return (
     <section className="menuEnter min-w-115 max-w-115 font-(family-name:--roboto-400) text-(--black) text-xl bg-(--tan) border-1 border-(--aqua) border-dashed pb-3 lg:max-xl:text-base xl:max-2xl:text-lg">
         <h3 className="font-(family-name:--bodoni-400) italic text-5xl text-(--light-red) p-3 py-6 bg-(--neon-yellow) border-b-(--aqua) border-b-1 border-dashed lg:max-xl:text-3xl lg:max-xl:py-4 xl:max-2xl:text-4xl xl:max-2xl:p-5">Instructions</h3>
@@ -151,7 +121,7 @@ function StartMenu({ setPlayState, playerName, setPlayerName, setStartTime } : {
             <div className="flex items-center gap-2">
                 <div>
                     <label className="aria-invisible" htmlFor="name">Name</label>
-                    <input className={`w-[100%] font-(family-name:--roboto-400) text-xl bg-(--off-white) p-3 border-2 rounded-lg ${(formErrors.name !== null) ? "border-(--light-red)" : "border-(--black)"}  lg:max-xl:text-base xl:max-2xl:text-lg`} autoFocus={true} id="name" type="text" name="name" placeholder="John Doe" value={formData.name} onChange={(e) => {
+                    <input key={submitCount} className={`w-[100%] font-(family-name:--roboto-400) text-xl bg-(--off-white) p-3 border-2 rounded-lg ${(formErrors.name !== null) ? "border-(--light-red) inputShake" : "border-(--black)"}  lg:max-xl:text-base xl:max-2xl:text-lg`} autoFocus={true} id="name" type="text" name="name" placeholder="John Doe" value={formData.name} onChange={(e) => {
                         setFormData({...formData, name: e.target.value}); 
                     }}/>
                 </div>

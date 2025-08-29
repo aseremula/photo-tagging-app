@@ -1,4 +1,9 @@
-function ImageIcon({ imagePath="", markAsFound=false } : { imagePath: string, markAsFound: boolean }) {
+type ImageIconComponentProps = {
+  imagePath: string; 
+  markAsFound: boolean;
+}
+
+function ImageIcon({ imagePath="", markAsFound=false } : ImageIconComponentProps) {
   
   return (
     <div className={`min-w-[31px] min-h-[31px] max-w-13 max-h-13 pointer-events-none rounded-sm overflow-hidden flex items-center justify-center ${imagePath==="" && "bg-(--light-red)"}`}>

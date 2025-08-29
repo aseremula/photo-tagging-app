@@ -6,23 +6,25 @@ import EndMenu from './components/EndMenu';
 import { LevelContext } from './context/levelContext';
 import type { LevelContextType } from './context/levelContext';
 import Stopwatch from './components/Stopwatch';
+import type { Coordinates, StopwatchStatus, PlayState } from './types/customTypes';
 
 type DeviceCompatibility = "compatible" | "rotate" | "incompatible" | "unknown" | "loading";
 
 function App() {
   const WIDTH_BREAKPOINT = 592; // only support responsive design for devices with this screen width in pixels or higher due to using such a wide/detailed image
   const [compatibility, setCompatibility] = useState<DeviceCompatibility>("loading");
-  const [levelContext, ] = useState<LevelContextType>({ // Since we are not using setLevelContext, remove the linting error via destructuring
+  const [levelContext, ] = useState<LevelContextType>({ // Since we are not using setLevelContext, remove the linting error via destructuring. Overwrite initial context values with intended values (although in this case they are the same)
     levelInfo: { 
       img: "san_francisco", 
       title: "San Francisco",
       numberOfImages: 5, 
-      levelNumber: 1 
+      levelNumber: 1
     }
 });
 
+  const totalLeaderboardScores = 5; // number of scores to populate leaderboard
   const [imageSet, setImageSet] = useState<boolean[]>([]);
-  const [playState, setPlayState] = useState<playStates>("start_menu");
+  const [playState, setPlayState] = useState<PlayState>("start_menu");
   const [correctGuessCoordinates, setCorrectGuessCoordinates] = useState<Coordinates[]>([]);
   const [playerName, setPlayerName] = useState("Player");
   const [stopwatchStatus, setStopwatchStatus] = useState<StopwatchStatus>("off");
@@ -79,12 +81,19 @@ function App() {
   return (
     <div>
       {(compatibility === "compatible") ? 
+        // If device compatible, show the game
         <LevelContext.Provider value={levelContext}>
           <main className="relative">
             {/* When either menu is open, gameboard does not accept clicks. However, the navigation still does! */}
             {(playState === "start_menu" || playState === "end_menu") && 
               <div className="z-1 fixed bg-black/50 min-h-[100%] w-[100%] flex items-center justify-center">
-                {(playState === "start_menu") ? <StartMenu setPlayState={setPlayState} playerName={playerName} setPlayerName={setPlayerName} setStartTime={setStartTime}/> : <EndMenu setPlayState={setPlayState} levelNumber={levelContext.levelInfo.levelNumber} numberOfScores={5} playerName={playerName} endTime={endTime} setEndTime={setEndTime}/>}
+                {(playState === "start_menu") ?
+                  <StartMenu setPlayState={newPlayState => setPlayState(newPlayState)} playerName={playerName} setPlayerName={newPlayerName => setPlayerName(newPlayerName)} setStartTime={newStartTime => setStartTime(newStartTime)}/> 
+                  : 
+                  <EndMenu setPlayState={newPlayState => setPlayState(newPlayState)} levelNumber={levelContext.levelInfo.levelNumber} numberOfScores={totalLeaderboardScores} playerName={playerName} endTime={endTime} setEndTime={newEndTime => setEndTime(newEndTime)}/>
+                  // For testing localhost only
+                  // <EndMenu setPlayState={setPlayState} levelNumber={levelContext.levelInfo.levelNumber} numberOfScores={totalLeaderboardScores} playerName={playerName} endTime={endTime} setEndTime={setEndTime}/>
+                }
               </div>
             }
 
@@ -92,11 +101,13 @@ function App() {
               <Navigation imageSet={imageSet}>
                 <Stopwatch startTime={startTime} endTime={endTime} setEndTime={newEndTime => setEndTime(newEndTime)} stopwatchStatus={stopwatchStatus} setStopwatchStatus={newStopwatchStatus => setStopwatchStatus(newStopwatchStatus)}/>
               </Navigation>
-              <Gameboard imageSet={imageSet} setImageSet={setImageSet} playState={playState} setPlayState={setPlayState} correctGuessCoordinates={correctGuessCoordinates} setCorrectGuessCoordinates={setCorrectGuessCoordinates}/>
+
+              <Gameboard imageSet={imageSet} setImageSet={newImageSet => setImageSet(newImageSet)} playState={playState} setPlayState={newPlayState => setPlayState(newPlayState)} correctGuessCoordinates={correctGuessCoordinates} setCorrectGuessCoordinates={newCorrectGuessCoordinates => setCorrectGuessCoordinates(newCorrectGuessCoordinates)}/>
             </div>
           </main> 
         </LevelContext.Provider>
         :
+        // If device incompatible, show the error message
         <main className="bg-(--off-white) min-h-[100vh] flex flex-col gap-4 justify-start font-(family-name:--roboto-400) text-base">
           <nav className="bg-(--tan) p-5 flex items-center justify-end gap-2 pointer-events-none border-b-(--aqua) border-b-1 border-dashed">
             <img src="/icon.webp" width="65px" height="auto" alt="eBoy's Blockbob Eater"/>

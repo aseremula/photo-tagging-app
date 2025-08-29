@@ -86,7 +86,7 @@ input:is(:-webkit-autofill, :autofill) {
 }
 
 @media (prefers-reduced-motion) {
-  .loadingScreenText, .svgEnter, .appear, .loadingScreenIcon, .markerEnter, .menuEnter, .fadeIn, .overtimeText {
+  .loadingScreenText, .svgEnter, .appear, .loadingScreenIcon, .markerEnter, .menuEnter, .fadeIn, .overtimeText, .inputShake, .successText {
     animation: none;
   }
 }
@@ -307,4 +307,43 @@ input:is(:-webkit-autofill, :autofill) {
   {
     color: var(--light-red);
   }
+}
+
+.inputShake { 
+  animation-name: inputShake;
+  animation-duration: 0.2s;
+  animation-iteration-count: 1;
+  animation-direction: normal;
+  animation-timing-function: ease;
+}
+
+@keyframes inputShake
+{
+  0%, 100%
+  {
+    transform: translateX(0);
+  }
+
+  25%
+  {
+    transform: translateX(2px);
+  }
+
+  50%
+  {
+    transform: translateX(-2px);
+  }
+
+  75%
+  {
+    transform: translateX(2px);
+  }
+}
+
+.successText {
+  animation-name: overtimeText;
+  animation-duration: 0.4s;
+  animation-iteration-count: 9;
+  animation-direction: alternate-reverse;
+  animation-timing-function: ease;
 }

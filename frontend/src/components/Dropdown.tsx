@@ -1,17 +1,31 @@
 import { useState, useContext } from 'react';
-import type { RefObject, Dispatch, SetStateAction, MouseEvent } from 'react';
+import type { RefObject, MouseEvent } from 'react';
 import ImageIcon from "./ImageIcon";
 import { LevelContext } from '../context/levelContext';
+import type { Coordinates, BubbleDirection, PlayState } from '../types/customTypes';
+import { fetchApi, type AvailableMethods, type HostType } from '../functions/fetchApi';
 
 type GuessResult = "correct" | "incorrect" | "waiting" | "loading";
 type ImagePosition = 0 | 1 | 2 | 3 | 4 | 5;
-interface guessedImageState {
+interface GuessedImageState {
   imagePosition: ImagePosition;
   result: GuessResult;
 }
 
-function Dropdown({ imageSet, setImageSet, bubbleDirection, setPlayState, setShowDropdown, dropdownTimeoutRef, coordinates, correctGuessCoordinates, setCorrectGuessCoordinates } : { imageSet: boolean[], setImageSet: Dispatch<SetStateAction<boolean[]>>, bubbleDirection: BubbleDirection, setPlayState: Dispatch<SetStateAction<playStates>>, setShowDropdown: Dispatch<SetStateAction<boolean>>, dropdownTimeoutRef: RefObject<ReturnType<typeof setTimeout>>, coordinates: Coordinates, correctGuessCoordinates: Coordinates[], setCorrectGuessCoordinates: Dispatch<SetStateAction<Coordinates[]>>}) {
-  const [guessedImage, setGuessedImage] = useState<guessedImageState>({imagePosition: 0, result: "waiting"});
+type DropdownComponentProps = {
+  imageSet: boolean[];
+  setImageSet: (newImageSet: boolean[]) => void;
+  bubbleDirection: BubbleDirection;
+  setPlayState: (newPlayState: PlayState) => void;
+  setShowDropdown: (newShowDropdown: boolean) => void;
+  dropdownTimeoutRef: RefObject<ReturnType<typeof setTimeout>>;
+  coordinates: Coordinates;
+  correctGuessCoordinates: Coordinates[];
+  setCorrectGuessCoordinates: (newCorrectGuessCoordinates: Coordinates[]) => void;
+}
+
+function Dropdown({ imageSet, setImageSet, bubbleDirection, setPlayState, setShowDropdown, dropdownTimeoutRef, coordinates, correctGuessCoordinates, setCorrectGuessCoordinates } : DropdownComponentProps) {
+  const [guessedImage, setGuessedImage] = useState<GuessedImageState>({imagePosition: 0, result: "waiting"});
   const levelContext = useContext(LevelContext);
 
   async function handleClick(e: MouseEvent<HTMLElement>, imagePosition: ImagePosition)
@@ -22,12 +36,13 @@ function Dropdown({ imageSet, setImageSet, bubbleDirection, setPlayState, setSho
       SUCCESS: "SUCCESS",
       FAILURE: "FAILURE",
     };
-  
-    // const path = `https://efind-qk5v.onrender.com/gameboards/${level.levelNumber}/guess`; // TODO: change link to match localhost's
-    const path = `http://localhost:3003/gameboards/${levelContext.levelInfo.levelNumber}/guess?coordinateXGuess=${coordinates.standardX}&coordinateYGuess=${coordinates.standardY}&imageNumber=${imagePosition}`;
-    const method = "GET";
+    
+    // TODO: change to web when done testing
+    const hostType: HostType = "local";
+    const path = `/gameboards/${levelContext.levelInfo.levelNumber}/guess?coordinateXGuess=${coordinates.standardX}&coordinateYGuess=${coordinates.standardY}&imageNumber=${imagePosition}`;
+    const method: AvailableMethods = "GET";
 
-    const response = await getApiResponse(path, method);  
+    const response = await fetchApi(hostType, path, method, null);  
     if(response)
     {
       if(response.outcome === outcomes.FAILURE)
@@ -68,51 +83,12 @@ function Dropdown({ imageSet, setImageSet, bubbleDirection, setPlayState, setSho
     }
   }
 
-  async function getApiResponse(path: string, method: string) 
-  {
-    try
-    {
-      const headers = {
-        'Content-Type': 'application/json'
-      };
-
-      const response = await fetch(path, {
-        mode: 'cors', 
-        method: method, 
-        headers: headers,
-        credentials: 'include', // must add this when using cookies so credentials (cookies) are sent with request to server
-      });
-
-      if(!response.ok)
-      {
-        throw new Error(`Response status: ${response.status}`);
-      }
-      else
-      {
-        const APIData = await response.json();
-        return APIData;
-      }
-    }
-    catch(error)
-    {
-      // As anything (unknown) can be thrown, use a type guard to narrow down the type of error before accessing the message property
-      if(error instanceof Error) 
-      {
-        console.error(error.message);
-      }
-      else
-      {
-        console.error(error);
-      }
-    }
-  }
-
   const renderList = () => {
     const listItems = [];
     for (let imageCounter = 1; imageCounter <= levelContext.levelInfo.numberOfImages; imageCounter++) {
       listItems.push(
         <li key={imageCounter} className="flex items-center justify-center">
-          <button type="button" className={`cursor-${(guessedImage.result === "correct" || imageSet[imageCounter-1]) ? "default" : "pointer"} relative ${(guessedImage.imagePosition === 0 || guessedImage.imagePosition === imageCounter || guessedImage.result !== "waiting" || imageSet[imageCounter-1]) ? "opacity-100" : "opacity-50"}`} onMouseEnter={() => (setGuessedImage({...guessedImage, imagePosition: imageCounter as ImagePosition, result: "waiting"}))} onClick={(e) => handleClick(e, imageCounter as ImagePosition)} disabled={(guessedImage.result === "correct" || imageSet[imageCounter-1]) ? true : false} aria-label={`Guess image ${imageCounter} is located here`}>
+          <button type="button" className={`cursor-${(guessedImage.result === "correct" || imageSet[imageCounter-1]) ? "default" : "pointer"} relative ${(guessedImage.imagePosition === 0 || guessedImage.imagePosition === imageCounter || guessedImage.result !== "waiting" || imageSet[imageCounter-1]) ? "opacity-100" : "opacity-50"}`} onMouseEnter={() => (setGuessedImage({...guessedImage, imagePosition: imageCounter as ImagePosition, result: "waiting"}))} onClick={(e) => handleClick(e, imageCounter as ImagePosition)} disabled={(guessedImage.result === "correct" || imageSet[imageCounter-1]) ? true : false} aria-label={`Guess image number ${imageCounter} is located here`}>
             {(guessedImage.imagePosition === imageCounter && guessedImage.result === "correct") && <svg className="svgEnter z-1 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 fill-(--light-red) pointer-events-none lg:max-2xl:w-6 lg:max-2xl:h-6 xl:max-2xl:w-8 xl:max-2xl:h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M382-208 122-468l90-90 170 170 366-366 90 90-456 456Z"/></svg>}
 
             {(guessedImage.imagePosition === imageCounter && guessedImage.result === "incorrect") && <svg className="svgEnter z-1 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 fill-(--light-red) pointer-events-none lg:max-xl:w-6 lg:max-xl:h-6 xl:max-2xl:w-8 xl:max-2xl:h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="m256-168-88-88 224-224-224-224 88-88 224 224 224-224 88 88-224 224 224 224-88 88-224-224-224 224Z"/></svg>}

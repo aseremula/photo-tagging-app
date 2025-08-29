@@ -1,18 +1,27 @@
 import { useState, useRef, useContext, useEffect } from 'react';
 import type { MouseEvent } from 'react';
-import type { Dispatch, SetStateAction } from 'react';
 import Dropdown from './Dropdown';
 import { LevelContext } from '../context/levelContext';
+import type { Coordinates, BubbleDirection, PlayState } from '../types/customTypes';
 
-interface dropdownCoordinatesState {
+interface DropdownCoordinatesState {
   top: number;
   left: number;
   bubbleDirection: BubbleDirection;
 }
 
-function Gameboard({ imageSet, setImageSet, playState, setPlayState, correctGuessCoordinates, setCorrectGuessCoordinates }: { imageSet: boolean[], setImageSet: Dispatch<SetStateAction<boolean[]>>, playState: playStates, setPlayState: Dispatch<SetStateAction<playStates>>, correctGuessCoordinates: Coordinates[], setCorrectGuessCoordinates: Dispatch<SetStateAction<Coordinates[]>> }) {
+type GameboardComponentProps = {
+  imageSet: boolean[];
+  setImageSet: (newImageSet: boolean[]) => void;
+  playState: PlayState;
+  setPlayState: (newPlayState: PlayState) => void;
+  correctGuessCoordinates: Coordinates[];
+  setCorrectGuessCoordinates: (newCorrectGuessCoordinates: Coordinates[]) => void;
+}
+
+function Gameboard({ imageSet, setImageSet, playState, setPlayState, correctGuessCoordinates, setCorrectGuessCoordinates } : GameboardComponentProps) {
   const [showDropdown, setShowDropdown] = useState(false);
-  const [dropdownCoordinates, setDropdownCoordinates] = useState<dropdownCoordinatesState>({ top: -65, left: 2, bubbleDirection: "bottom" });
+  const [dropdownCoordinates, setDropdownCoordinates] = useState<DropdownCoordinatesState>({ top: -65, left: 2, bubbleDirection: "bottom" });
   const [coordinates, setCoordinates] = useState({ pageX: 0, pageY: 0, standardX: 0, standardY: 0 });
   const dropdownTimeoutRef = useRef(0);
   const levelContext = useContext(LevelContext);
@@ -116,10 +125,14 @@ function Gameboard({ imageSet, setImageSet, playState, setPlayState, correctGues
       transform: "translateX(-50%) translateY(-50%)",
       }} className="z-2">
         {/* The key is only used for refreshing the dropdown on touchscreens - if the user guesses correctly and clicks other spots of the image immediately, return the dropdown to its initial state */}
-        {(showDropdown && (playState === "gameboard_guessing")) && <span className="appear" key={`${coordinates.standardX}-${coordinates.standardY}`} onMouseEnter={() => {
-        setShowDropdown(true);
-        clearTimeout(dropdownTimeoutRef.current); // do not close the dropdown while the user's mouse moves around the component
-        }}><Dropdown imageSet={imageSet} setImageSet={setImageSet} bubbleDirection={dropdownCoordinates.bubbleDirection} setPlayState={setPlayState} setShowDropdown={setShowDropdown} dropdownTimeoutRef={dropdownTimeoutRef} coordinates={coordinates} correctGuessCoordinates={correctGuessCoordinates} setCorrectGuessCoordinates={setCorrectGuessCoordinates}/></span>}
+        {(showDropdown && (playState === "gameboard_guessing")) && 
+          <span className="appear" key={`${coordinates.standardX}-${coordinates.standardY}`} onMouseEnter={() => {
+          setShowDropdown(true);
+          clearTimeout(dropdownTimeoutRef.current); // do not close the dropdown while the user's mouse moves around the component
+          }}>
+            <Dropdown imageSet={imageSet} setImageSet={newImageSet => setImageSet(newImageSet)} bubbleDirection={dropdownCoordinates.bubbleDirection} setPlayState={newPlayState => setPlayState(newPlayState)} setShowDropdown={newShowDropdown => setShowDropdown(newShowDropdown)} dropdownTimeoutRef={dropdownTimeoutRef} coordinates={coordinates} correctGuessCoordinates={correctGuessCoordinates} setCorrectGuessCoordinates={newCorrectGuessCooordinates => setCorrectGuessCoordinates(newCorrectGuessCooordinates)}/>
+          </span>
+        }
       </span>
 
       {gameboardMarkers.map((guessCoordinates, index) => 

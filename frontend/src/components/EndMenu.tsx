@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import type { Dispatch, SetStateAction } from 'react';
 import { format } from "date-fns";
+// import type { Dispatch, SetStateAction } from 'react'; // For testing localhost only
+import type { PlayState } from '../types/customTypes';
+import { fetchApi, type AvailableMethods, type HostType } from '../functions/fetchApi';
 
-type apiError = string | null;
+type ApiError = string | null;
 type Score = { id: string, name: string, time: string, leaderboardId: number };
-interface apiLeaderboardResponse {
+interface ApiLeaderboardResponse {
     isPlayerOnLeaderboard: boolean;
     leaderboardScores: {
         id: number;
@@ -19,13 +21,24 @@ interface apiLeaderboardResponse {
         time: string;
     };
 };
-type leaderboardInfo = apiLeaderboardResponse | null;
+type LeaderboardInfo = ApiLeaderboardResponse | null;
 
-function EndMenu({ setPlayState, levelNumber, numberOfScores, playerName, endTime, setEndTime }: { setPlayState: Dispatch<SetStateAction<playStates>>, levelNumber: number, numberOfScores: number, playerName: string, endTime: number, setEndTime: Dispatch<SetStateAction<number>>}) {
+type EndMenuComponentProps = {
+    setPlayState: (newPlayState: PlayState) => void;
+    // setPlayState: Dispatch<SetStateAction<PlayState>>; // For testing localhost only
+    levelNumber: number;
+    numberOfScores: number;
+    playerName: string;
+    endTime: number;
+    setEndTime: (newEndTime: number) => void;
+    // setEndTime: Dispatch<SetStateAction<number>>; // For testing localhost only
+}
+
+function EndMenu({ setPlayState, levelNumber, numberOfScores, playerName, endTime, setEndTime } : EndMenuComponentProps) {
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<apiError>(null);
-    const [leaderboardInfo, setLeaderboardInfo] = useState<leaderboardInfo>(null);
-    const timeFormat = "m:ss.SS";
+    const [error, setError] = useState<ApiError>(null);
+    const [LeaderboardInfo, setLeaderboardInfo] = useState<LeaderboardInfo>(null);
+    const timeFormat = "mm:ss.SS";
 
     useEffect(() => {
         const outcomes = {
@@ -37,40 +50,25 @@ function EndMenu({ setPlayState, levelNumber, numberOfScores, playerName, endTim
         {
             try
             {
-                // TODO: fetch leaderboard stats
-                // const path = `https://efind-qk5v.onrender.com/leaderboards?numberOfScores=${numberOfScores}`;
-                const path = `http://localhost:3003/leaderboards?numberOfScores=${numberOfScores}`;
-                const method = "POST";
+                // TODO: change to web when done testing
+                const path = `/leaderboards?numberOfScores=${numberOfScores}`;
+                const hostType: HostType = "local";
+                const method: AvailableMethods = "POST";
                 const body = { 
                     levelNumber: levelNumber, 
                 };
-                const headers = {
-                    'Content-Type': 'application/json'
-                };
-
-                const response = await fetch(path, {
-                    mode: 'cors', 
-                    method: method, 
-                    headers: headers,
-                    credentials: 'include', // must add this when using cookies so credentials (cookies) are sent with request to server 
-                    body: JSON.stringify(body),
-                });
-
-                if(!response.ok)
+          
+                const response = await fetchApi(hostType, path, method, body);
+                if(response)
                 {
-                    throw new Error(`HTTP error: Status ${response.status}`);
-                }
-                else
-                {
-                    const APIData = await response.json();
-                    if(APIData.outcome === outcomes.FAILURE)
+                    if(response.outcome === outcomes.FAILURE)
                     {
                         setLeaderboardInfo(null);
                     }
-                    else if(APIData.outcome === outcomes.SUCCESS)
+                    else if(response.outcome === outcomes.SUCCESS)
                     {
-                        setLeaderboardInfo(APIData.data);
-                        setEndTime(APIData.data.playerScore.time);
+                        setLeaderboardInfo(response.data);
+                        setEndTime(response.data.playerScore.time);
                     }
                     setError(null);
                 }
@@ -111,11 +109,11 @@ function EndMenu({ setPlayState, levelNumber, numberOfScores, playerName, endTim
                 </thead>
                 <tbody className="border-1 border-(--black)">
                     <tr className="bg-(--white)">
-                        <th scope="row" className="p-3 text-center lg:max-xl:p-2">{(isLoading || leaderboardInfo === null) ? "-" : `#${leaderboardInfo.playerRank}`}</th>
-                        <td className={`p-3 font-(family-name:--bodoni-400) hyphens-auto wrap-anywhere italic text-left lg:max-xl:p-2 w-[100%] ${leaderboardInfo && leaderboardInfo.isPlayerOnLeaderboard && "text-(--light-red)"}`}>{(isLoading || leaderboardInfo === null) ? playerName : leaderboardInfo.playerScore.name}</td>
+                        <th scope="row" className="p-3 text-center lg:max-xl:p-2">{(isLoading || LeaderboardInfo === null) ? "-" : `#${LeaderboardInfo.playerRank}`}</th>
+                        <td className={`p-3 font-(family-name:--bodoni-400) hyphens-auto wrap-anywhere italic text-left lg:max-xl:p-2 w-[100%] ${LeaderboardInfo && LeaderboardInfo.isPlayerOnLeaderboard && "text-(--light-red)"}`}>{(isLoading || LeaderboardInfo === null) ? playerName : LeaderboardInfo.playerScore.name}</td>
                         
                         {/* Set API/backend time if API call was successful, otherwise display Stopwatch time */}
-                        <td className={`p-3 text-right lg:max-xl:p-2 ${leaderboardInfo && leaderboardInfo.isPlayerOnLeaderboard && "text-(--light-red)"}`}>{(isLoading) ? "--" : (leaderboardInfo === null) ? format(new Date(endTime), timeFormat) : format(new Date(leaderboardInfo.playerScore.time), timeFormat)}</td>
+                        <td className={`p-3 text-right lg:max-xl:p-2 ${LeaderboardInfo && LeaderboardInfo.isPlayerOnLeaderboard && "text-(--light-red)"}`}>{(isLoading) ? "--" : (LeaderboardInfo === null) ? format(new Date(endTime), timeFormat) : format(new Date(LeaderboardInfo.playerScore.time), timeFormat)}</td>
                     </tr>
                 </tbody>
             </table>
@@ -126,7 +124,7 @@ function EndMenu({ setPlayState, levelNumber, numberOfScores, playerName, endTim
             <p className="font-bold text-(--gray) loadingScreenText">Grabbing leaderboard...</p>
         </div> 
        :
-        ((error || leaderboardInfo === null) ?
+        ((error || LeaderboardInfo === null) ?
             <div className="p-3 text-center">
                 <p className="text-3xl lg:max-xl:text-xl xl:max-2xl:text-2xl">⚠️ ✋ 🤔</p>
                 <p>There was an error grabbing the leaderboard.</p>
@@ -143,11 +141,11 @@ function EndMenu({ setPlayState, levelNumber, numberOfScores, playerName, endTim
                         </tr>
                     </thead>
                     <tbody className="border-1 border-(--black)">
-                        {leaderboardInfo.leaderboardScores.scores.map((score, index) => (
+                        {LeaderboardInfo.leaderboardScores.scores.map((score, index) => (
                         <tr key={score.id} className="odd:bg-white even:bg-(--off-white)">
                             <th scope="row" className="p-3 text-center lg:max-xl:p-2">#{index+1}</th>
-                            <td className={`p-3 font-(family-name:--bodoni-400) hyphens-auto wrap-anywhere italic text-left w-[100%] lg:max-xl:p-2 ${score.id === leaderboardInfo.playerScore.id && "text-(--light-red)"}`}>{score.name}</td>
-                            <td className={`p-3 text-right lg:max-xl:p-2 ${score.id === leaderboardInfo.playerScore.id && "text-(--light-red)"}`}>{format(new Date(score.time), timeFormat)}</td>
+                            <td className={`p-3 font-(family-name:--bodoni-400) hyphens-auto wrap-anywhere italic text-left w-[100%] lg:max-xl:p-2 ${score.id === LeaderboardInfo.playerScore.id && "text-(--light-red)"}`}>{score.name}</td>
+                            <td className={`p-3 text-right lg:max-xl:p-2 ${score.id === LeaderboardInfo.playerScore.id && "text-(--light-red)"}`}>{format(new Date(score.time), timeFormat)}</td>
                         </tr>))}
                     </tbody>
                 </table>

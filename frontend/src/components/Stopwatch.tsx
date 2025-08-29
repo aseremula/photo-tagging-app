@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format, getTime } from "date-fns";
+import type { StopwatchStatus } from '../types/customTypes';
 
 type StopwatchComponentProps = {
   startTime: number;
@@ -9,7 +10,7 @@ type StopwatchComponentProps = {
   setStopwatchStatus: (newStopwatchStatus: StopwatchStatus) => void;
 }
 
-function Stopwatch({ startTime, endTime, setEndTime, stopwatchStatus, setStopwatchStatus }: StopwatchComponentProps) {
+function Stopwatch({ startTime, endTime, setEndTime, stopwatchStatus, setStopwatchStatus } : StopwatchComponentProps) {
     const [time, setTime] = useState(0);
     const [isOvertime, setIsOvertime] = useState(false);
     const MAX_TIME_MILLISECONDS = 3599990; // 59:59.59 time in milliseconds
@@ -61,7 +62,7 @@ function Stopwatch({ startTime, endTime, setEndTime, stopwatchStatus, setStopwat
           </div>
         </>
         :
-        <p>Success!</p>
+        <p className="successText">Success!</p>
       }
     </>
   )

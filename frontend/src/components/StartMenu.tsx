@@ -64,9 +64,8 @@ function StartMenu({ setPlayState, playerName, setPlayerName, setStartTime } : S
             name: null,
         };
     
-        // TODO: change to web when done testing
         const name = e.currentTarget.elements.name.value;
-        const hostType: HostType = "local";
+        const hostType: HostType = "web";
         const path = "/names";
         const method: AvailableMethods = "POST";
         const body = { 

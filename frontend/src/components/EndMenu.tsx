@@ -50,9 +50,8 @@ function EndMenu({ setPlayState, levelNumber, numberOfScores, playerName, endTim
         {
             try
             {
-                // TODO: change to web when done testing
                 const path = `/leaderboards?numberOfScores=${numberOfScores}`;
-                const hostType: HostType = "local";
+                const hostType: HostType = "web";
                 const method: AvailableMethods = "POST";
                 const body = { 
                     levelNumber: levelNumber, 

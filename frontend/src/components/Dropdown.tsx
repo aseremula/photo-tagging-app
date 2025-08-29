@@ -37,8 +37,7 @@ function Dropdown({ imageSet, setImageSet, bubbleDirection, setPlayState, setSho
       FAILURE: "FAILURE",
     };
     
-    // TODO: change to web when done testing
-    const hostType: HostType = "local";
+    const hostType: HostType = "web";
     const path = `/gameboards/${levelContext.levelInfo.levelNumber}/guess?coordinateXGuess=${coordinates.standardX}&coordinateYGuess=${coordinates.standardY}&imageNumber=${imagePosition}`;
     const method: AvailableMethods = "GET";
 

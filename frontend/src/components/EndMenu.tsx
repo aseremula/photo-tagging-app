@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { format } from "date-fns";
-// import type { Dispatch, SetStateAction } from 'react'; // For testing localhost only
 import type { PlayState } from '../types/customTypes';
 import { fetchApi, type AvailableMethods, type HostType } from '../functions/fetchApi';
 
@@ -25,13 +24,11 @@ type LeaderboardInfo = ApiLeaderboardResponse | null;
 
 type EndMenuComponentProps = {
     setPlayState: (newPlayState: PlayState) => void;
-    // setPlayState: Dispatch<SetStateAction<PlayState>>; // For testing localhost only
     levelNumber: number;
     numberOfScores: number;
     playerName: string;
     endTime: number;
     setEndTime: (newEndTime: number) => void;
-    // setEndTime: Dispatch<SetStateAction<number>>; // For testing localhost only
 }
 
 function EndMenu({ setPlayState, levelNumber, numberOfScores, playerName, endTime, setEndTime } : EndMenuComponentProps) {
@@ -90,7 +87,7 @@ function EndMenu({ setPlayState, levelNumber, numberOfScores, playerName, endTim
         }
         setIsLoading(true);
         getLeaderboard(); 
-    }, [levelNumber, numberOfScores, playerName, setEndTime]);
+    }, [levelNumber, numberOfScores, playerName]);
 
   return (
     <section className="menuEnter min-w-115 max-w-115 font-(family-name:--roboto-400) text-(--black) text-xl bg-(--tan) border-1 border-(--aqua) border-dashed overflow-y-auto max-h-[78vh] lg:max-xl:text-lg xl:max-2xl:text-lg">

@@ -91,8 +91,6 @@ function App() {
                   <StartMenu setPlayState={newPlayState => setPlayState(newPlayState)} playerName={playerName} setPlayerName={newPlayerName => setPlayerName(newPlayerName)} setStartTime={newStartTime => setStartTime(newStartTime)}/> 
                   : 
                   <EndMenu setPlayState={newPlayState => setPlayState(newPlayState)} levelNumber={levelContext.levelInfo.levelNumber} numberOfScores={totalLeaderboardScores} playerName={playerName} endTime={endTime} setEndTime={newEndTime => setEndTime(newEndTime)}/>
-                  // For testing localhost only
-                  // <EndMenu setPlayState={setPlayState} levelNumber={levelContext.levelInfo.levelNumber} numberOfScores={totalLeaderboardScores} playerName={playerName} endTime={endTime} setEndTime={setEndTime}/>
                 }
               </div>
             }

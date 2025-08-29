@@ -22,7 +22,7 @@ app.use(session({
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: ["https://efseek.netlify.app", "http://localhost:5173"],
+    origin: ["https://e-find.netlify.app", "http://localhost:5173"],
     methods: ["POST", "GET", "PUT", "OPTIONS", "HEAD"],
     credentials: true, // Enable cookies and credentials
     optionsSuccessStatus: 200, // For legacy browser support

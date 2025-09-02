@@ -4,7 +4,7 @@ export type HostType = "local" | "web";
 export async function fetchApi(hostType: HostType, path: string, method: AvailableMethods, body: object | null)
 {
     const LOCALHOST_URL = "http://localhost:3003";
-    const WEBHOST_URL = "https://efind-qk5v.onrender.com";
+    const WEBHOST_URL = "https://efind-8ubk.onrender.com/api"; // frontend link + "/api" as we are rewriting to backend in order to send cookies. Since Render (onrender) is on the Public Suffix List (won't let you set cookies for security purposes), we will point to the backend to simulate the frontend and backend being on the same domain and therefore sharing cookies automatically
 
     try
     {

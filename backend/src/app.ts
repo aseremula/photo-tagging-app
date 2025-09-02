@@ -10,19 +10,22 @@ const leaderboardRouter = require("./routes/leaderboardRouter");
 const gameboardRouter = require("./routes/gameboardRouter");
 
 app.use(express.json());
+app.set("trust proxy", 1); // trust X-Forwarded- headers on Render so request is seen as secure (needed for sharing cookies between front and backend)
 app.use(session({ 
   secret: process.env.SECRET, 
-  resave: false, saveUninitialized: false, 
-  cookie: {
-    sameSite: 'none', // allow explicit cross-site cookies as the front and back-end are on different sites
-    secure: true, // require cookies to be served over HTTPS and not HTTP - must be true when sameSite is 'none'
-    httpOnly: true, // stop client-side JavaScript access to cookie, which prevents cross-site scripting (XSS) attacks
-  }, 
+  resave: false, 
+  saveUninitialized: false,
+  proxy: true,
+  name: "eFIND", // cookie name
+  sameSite: 'none', // allow explicit cross-site cookies as the front and back-end are on different sites
+  secure: true, // require cookies to be served over HTTPS and not HTTP - must be true when sameSite is 'none'
+  httpOnly: true, // stop client-side JavaScript access to cookie, which prevents cross-site scripting (XSS) attacks
+  partitioned: true, // for Google CHIPS update, "...cookies from embedded sites will be partitioned and only readable from the same top level site from which it was created"
 })); // use sessions to store user-specific data like name and leaderboard time
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: ["https://e-find.netlify.app", "http://localhost:5173"],
+    origin: ["https://efind-8ubk.onrender.com", "http://localhost:5173"], // only accept requests from local & web frontends
     methods: ["POST", "GET", "PUT", "OPTIONS", "HEAD"],
     credentials: true, // Enable cookies and credentials
     optionsSuccessStatus: 200, // For legacy browser support

@@ -90,7 +90,7 @@ function EndMenu({ setPlayState, levelNumber, numberOfScores, playerName, endTim
     }, [levelNumber, numberOfScores, playerName]);
 
   return (
-    <section className="menuEnter min-w-115 max-w-115 font-(family-name:--roboto-400) text-(--black) text-xl bg-(--tan) border-1 border-(--aqua) border-dashed overflow-y-auto max-h-[78vh] lg:max-xl:text-lg xl:max-2xl:text-lg">
+    <section className="menuEnter min-w-115 max-w-115 font-(family-name:--roboto-400) text-(--black) text-xl bg-(--tan) border-1 border-(--aqua) border-dashed overflow-y-auto max-h-[88vh] lg:max-xl:text-lg xl:max-2xl:text-lg">
         <h3 className="font-(family-name:--bodoni-400) italic text-5xl text-(--light-red) p-3 py-6 bg-(--neon-yellow) border-b-(--aqua) border-b-1 border-dashed lg:max-xl:text-3xl lg:max-xl:py-4 xl:max-2xl:text-4xl xl:max-2xl:p-5">Results</h3>
        
         <div className="p-3">

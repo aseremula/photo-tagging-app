@@ -102,7 +102,7 @@ function StartMenu({ setPlayState, playerName, setPlayerName, setStartTime } : S
     }
 
   return (
-    <section className="menuEnter min-w-115 max-w-115 font-(family-name:--roboto-400) text-(--black) text-xl bg-(--tan) border-1 border-(--aqua) border-dashed pb-3 lg:max-xl:text-base xl:max-2xl:text-lg">
+    <section className="menuEnter min-w-115 max-w-115 font-(family-name:--roboto-400) text-(--black) text-xl bg-(--tan) border-1 border-(--aqua) border-dashed pb-3 overflow-y-auto max-h-[88vh] lg:max-xl:text-base xl:max-2xl:text-lg">
         <h3 className="font-(family-name:--bodoni-400) italic text-5xl text-(--light-red) p-3 py-6 bg-(--neon-yellow) border-b-(--aqua) border-b-1 border-dashed lg:max-xl:text-3xl lg:max-xl:py-4 xl:max-2xl:text-4xl xl:max-2xl:p-5">Instructions</h3>
         <p className="p-3">Can you find these 5 people scattered throughout eBoy's <span className="text-(--aqua) font-bold">{levelContext.levelInfo.title}</span> pixorama? Find and click them fast enough and you may even appear on the leaderboard!</p>
 
@@ -111,7 +111,7 @@ function StartMenu({ setPlayState, playerName, setPlayerName, setStartTime } : S
                 <svg className="w-6 h-6 fill-(--neon-yellow) pointer-events-none" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960"><path d="M450-290h60v-230h-60v230Zm30-298.46q13.73 0 23.02-9.29t9.29-23.02q0-13.73-9.29-23.02-9.29-9.28-23.02-9.28t-23.02 9.28q-9.29 9.29-9.29 23.02t9.29 23.02q9.29 9.29 23.02 9.29Zm.07 488.46q-78.84 0-148.21-29.92t-120.68-81.21q-51.31-51.29-81.25-120.63Q100-401.1 100-479.93q0-78.84 29.92-148.21t81.21-120.68q51.29-51.31 120.63-81.25Q401.1-860 479.93-860q78.84 0 148.21 29.92t120.68 81.21q51.31 51.29 81.25 120.63Q860-558.9 860-480.07q0 78.84-29.92 148.21t-81.21 120.68q-51.29 51.31-120.63 81.25Q558.9-100 480.07-100Zm-.07-60q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
                 <h4 className="text-xl font-bold font-(family-name:--bodoni-400) italic text-(--neon-yellow) lg:max-xl:text-base xl:max-2xl:text-lg">Notice</h4> 
             </div>
-            <p>This site uses its own cookies to track game data. Please allow cookies in order to play!</p>
+            <p>This site uses its own cookies to track game data. Please allow third-party cookies in order to play!</p>
         </div>
 
         <form className="flex flex-col gap-1 p-3" id="nameForm" action="" method="POST" onSubmit={handleStartForm}>

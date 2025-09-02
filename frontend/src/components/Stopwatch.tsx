@@ -58,7 +58,7 @@ function Stopwatch({ startTime, endTime, setEndTime, stopwatchStatus, setStopwat
         <>
           <svg className="min-w-8 min-h-8 max-w-13 max-h-13 fill-(--neon-yellow) pointer-events-none lg:max-2xl:w-8 lg:max-2xl:h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M480-132q-64 0-120-24t-98-66q-42-42-66-98t-24-120q0-64 24-120t66-98q42-42 98-66t120-24q64 0 120 24t98 66q42 42 66 98t24 120q0 64-24 120t-66 98q-42 42-98 66t-120 24Zm0-308Zm130 150 20-20-136-136v-194h-28v206l144 144ZM240-810l20 20-130 130-20-20 130-130Zm480 0 130 130-20 20-130-130 20-20ZM480-160q116 0 198-82t82-198q0-116-82-198t-198-82q-116 0-198 82t-82 198q0 116 82 198t198 82Z"/></svg>
           <div className="w-[200px] lg:max-xl:w-[105px] xl:max-2xl:w-[120px]">
-            <p className={(isOvertime && stopwatchStatus === "on") ? `overtimeText` : undefined}>{format(new Date(time), timeFormat)}</p>
+            <p className={(isOvertime) ? `overtimeText` : undefined}>{format(new Date(time), timeFormat)}</p>
           </div>
         </>
         :

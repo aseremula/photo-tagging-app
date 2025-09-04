@@ -46,7 +46,9 @@ function Dropdown({ imageSet, setImageSet, bubbleDirection, setPlayState, setSho
     {
       if(response.outcome === outcomes.FAILURE)
       {
-        throw Error(response.data.description);
+        alert("Sorry, an error occurred while processing your request. Please try again later.");
+        setGuessedImage({...guessedImage, imagePosition: 0, result: "waiting"});
+        console.error(response.description);
       }
       else if(response.outcome === outcomes.SUCCESS)
       {
@@ -78,7 +80,9 @@ function Dropdown({ imageSet, setImageSet, bubbleDirection, setPlayState, setSho
     }  
     else
     {
-      throw new Error("Failed to get response from API - internal server error");
+      alert("Sorry, an error occurred while processing your request. Please try again later.");
+      setGuessedImage({...guessedImage, imagePosition: 0, result: "waiting"});
+      console.error("Failed to get response from API - internal server error");
     }
   }
 

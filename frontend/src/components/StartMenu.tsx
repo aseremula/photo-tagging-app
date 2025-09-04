@@ -47,13 +47,12 @@ function StartMenu({ setPlayState, playerName, setPlayerName, setStartTime } : S
         name: null,
     });
     const [isLoading, setIsLoading] = useState(false);
-    const [submitCount, setSubmitCount] = useState(0); // only used as a key for the form input - when the user enters a non-valid name, the key must be refreshed so the shake animation plays on the input element
+    const [incorrectSubmitCount, setIncorrectSubmitCount] = useState(0); // only used as a key for the form input - when the user enters a non-valid name, the key must be refreshed so the shake animation plays on the input element
 
     async function handleStartForm(e: FormEvent<NameFormElement>)
     {
         e.preventDefault();
         setIsLoading(true);
-        setSubmitCount(submitCount+1);
         const outcomes = {
             SUCCESS: "SUCCESS",
             FAILURE: "FAILURE",
@@ -72,7 +71,7 @@ function StartMenu({ setPlayState, playerName, setPlayerName, setStartTime } : S
             name: name, 
         };
 
-        const response = await fetchApi(hostType, path, method, body); 
+        const response = await fetchApi(hostType, path, method, body);
         if(response)
         {
             if(response.outcome === outcomes.FAILURE)
@@ -84,6 +83,7 @@ function StartMenu({ setPlayState, playerName, setPlayerName, setStartTime } : S
                     }
                 });
                 setFormData({...formData, name: name});
+                setIncorrectSubmitCount(incorrectSubmitCount+1);
             }
             else if(response.outcome === outcomes.SUCCESS)
             {
@@ -96,7 +96,8 @@ function StartMenu({ setPlayState, playerName, setPlayerName, setStartTime } : S
         }  
         else
         {
-            throw new Error("Failed to get response from API - internal server error");
+            alert("Sorry, an error occurred while processing your request. Please try again later.");
+            console.error("Failed to get response from API - internal server error");
         } 
         setIsLoading(false); 
     }
@@ -120,7 +121,7 @@ function StartMenu({ setPlayState, playerName, setPlayerName, setStartTime } : S
             <div className="flex items-center gap-2">
                 <div>
                     <label className="aria-invisible" htmlFor="name">Name</label>
-                    <input key={submitCount} className={`w-[100%] font-(family-name:--roboto-400) text-xl bg-(--off-white) p-3 border-2 rounded-lg ${(formErrors.name !== null) ? "border-(--light-red) inputShake" : "border-(--black)"}  lg:max-xl:text-base xl:max-2xl:text-lg`} autoFocus={true} id="name" type="text" name="name" placeholder="John Doe" value={formData.name} onChange={(e) => {
+                    <input key={incorrectSubmitCount} className={`w-[100%] font-(family-name:--roboto-400) text-xl bg-(--off-white) p-3 border-2 rounded-lg ${(formErrors.name !== null) ? "border-(--light-red) inputShake" : "border-(--black)"}  lg:max-xl:text-base xl:max-2xl:text-lg`} autoFocus={true} id="name" type="text" name="name" placeholder="John Doe" value={formData.name} onChange={(e) => {
                         setFormData({...formData, name: e.target.value}); 
                     }}/>
                 </div>

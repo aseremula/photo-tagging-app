@@ -99,7 +99,7 @@ function App() {
               <Navigation imageSet={imageSet}>
                 <Stopwatch startTime={startTime} endTime={endTime} setEndTime={newEndTime => setEndTime(newEndTime)} stopwatchStatus={stopwatchStatus} setStopwatchStatus={newStopwatchStatus => setStopwatchStatus(newStopwatchStatus)}/>
               </Navigation>
-
+              
               <Gameboard imageSet={imageSet} setImageSet={newImageSet => setImageSet(newImageSet)} playState={playState} setPlayState={newPlayState => setPlayState(newPlayState)} correctGuessCoordinates={correctGuessCoordinates} setCorrectGuessCoordinates={newCorrectGuessCoordinates => setCorrectGuessCoordinates(newCorrectGuessCoordinates)}/>
             </div>
           </main> 
@@ -135,7 +135,7 @@ function App() {
             <>
             <svg className="self-center w-13 h-13 fill-(--gray) pointer-events-none"  xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M440-440v-80h80v80h-80Zm-80 80v-80h80v80h-80Zm160 0v-80h80v80h-80Zm80-80v-80h80v80h-80Zm-320 0v-80h80v80h-80Zm-67.69 300q-29.92 0-51.12-21.19Q140-182.39 140-212.31v-535.38q0-29.92 21.19-51.12Q182.39-820 212.31-820h535.38q29.92 0 51.12 21.19Q820-777.61 820-747.69v535.38q0 29.92-21.19 51.12Q777.61-140 747.69-140H212.31ZM280-200h80v-80h-80v80Zm160 0h80v-80h-80v80Zm320 0v-80 80Zm-560-80h80v-80h80v80h80v-80h80v80h80v-80h80v80h80v-80h-80v-80h80v-307.69q0-4.62-3.85-8.46-3.84-3.85-8.46-3.85H212.31q-4.62 0-8.46 3.85-3.85 3.84-3.85 8.46V-440h80v80h-80v80Zm12.31 80H200v-560h12.31q-4.62 0-8.46 3.85-3.85 3.84-3.85 8.46v535.38q0 4.62 3.85 8.46 3.84 3.85 8.46 3.85ZM760-440v80-80ZM600-280v80h80v-80h-80Z"/></svg>
 
-            <p className="self-center text-(--aqua)">Gathering pixels...</p>
+            <p className="self-center text-(--aqua) loadingPixelsText">Gathering pixels...</p>
             </>
             }
           </section>

@@ -86,7 +86,7 @@ input:is(:-webkit-autofill, :autofill) {
 }
 
 @media (prefers-reduced-motion) {
-  .loadingScreenText, .svgEnter, .appear, .loadingScreenIcon, .markerEnter, .menuEnter, .fadeIn, .overtimeText, .inputShake, .successText {
+  .loadingScreenText, .svgEnter, .appear, .loadingScreenIcon, .markerEnter, .menuEnter, .fadeIn, .overtimeText, .inputShake, .successText, .loadingPixelsText {
     animation: none;
   }
 }
@@ -346,4 +346,30 @@ input:is(:-webkit-autofill, :autofill) {
   animation-iteration-count: 9;
   animation-direction: alternate-reverse;
   animation-timing-function: ease;
+}
+
+.loadingPixelsText {
+  animation-name: loadingPixelsText;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-direction: normal;
+  animation-timing-function: linear;
+}
+
+@keyframes loadingPixelsText
+{
+  0%
+  { 
+    color: var(--aqua);
+  }
+  
+  50%
+  {
+    color: #2dcebe;
+  }
+
+  100%
+  {
+    color: var(--aqua);
+  }
 }

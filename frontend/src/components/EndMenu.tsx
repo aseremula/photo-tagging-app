@@ -3,7 +3,6 @@ import { format } from "date-fns";
 import type { PlayState } from '../types/customTypes';
 import { fetchApi, type AvailableMethods, type HostType } from '../functions/fetchApi';
 
-type ApiError = string | null;
 type Score = { id: string, name: string, time: string, leaderboardId: number };
 interface ApiLeaderboardResponse {
     isPlayerOnLeaderboard: boolean;
@@ -20,7 +19,7 @@ interface ApiLeaderboardResponse {
         time: string;
     };
 };
-type LeaderboardInfo = ApiLeaderboardResponse | null;
+type leaderboardInfo = ApiLeaderboardResponse | null;
 
 type EndMenuComponentProps = {
     setPlayState: (newPlayState: PlayState) => void;
@@ -33,8 +32,7 @@ type EndMenuComponentProps = {
 
 function EndMenu({ setPlayState, levelNumber, numberOfScores, playerName, endTime, setEndTime } : EndMenuComponentProps) {
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<ApiError>(null);
-    const [LeaderboardInfo, setLeaderboardInfo] = useState<LeaderboardInfo>(null);
+    const [leaderboardInfo, setLeaderboardInfo] = useState<leaderboardInfo>(null);
     const timeFormat = "mm:ss.SS";
 
     useEffect(() => {
@@ -45,45 +43,31 @@ function EndMenu({ setPlayState, levelNumber, numberOfScores, playerName, endTim
     
         async function getLeaderboard() 
         {
-            try
-            {
-                const path = `/leaderboards?numberOfScores=${numberOfScores}`;
-                const hostType: HostType = "web";
-                const method: AvailableMethods = "POST";
-                const body = { 
-                    levelNumber: levelNumber, 
-                };
+            const path = `/leaderboards?numberOfScores=${numberOfScores}`;
+            const hostType: HostType = "web";
+            const method: AvailableMethods = "POST";
+            const body = { 
+                levelNumber: levelNumber, 
+            };
           
-                const response = await fetchApi(hostType, path, method, body);
-                if(response)
-                {
-                    if(response.outcome === outcomes.FAILURE)
-                    {
-                        setLeaderboardInfo(null);
-                    }
-                    else if(response.outcome === outcomes.SUCCESS)
-                    {
-                        setLeaderboardInfo(response.data);
-                        setEndTime(response.data.playerScore.time);
-                    }
-                    setError(null);
-                }
-            }
-            catch(error)
+            const response = await fetchApi(hostType, path, method, body);
+            if(response)
             {
-                if(error instanceof Error) 
+                if(response.outcome === outcomes.FAILURE)
                 {
-                    setError(error.message);
+                    setLeaderboardInfo(null);
                 }
-                else
+                else if(response.outcome === outcomes.SUCCESS)
                 {
-                    setError("An unknown error has occured.");
+                    setLeaderboardInfo(response.data);
+                    setEndTime(response.data.playerScore.time);
                 }
             }
-            finally
+            else
             {
-                setIsLoading(false);
+                console.error("Failed to get response from API - internal server error");
             }
+            setIsLoading(false);
         }
         setIsLoading(true);
         getLeaderboard(); 
@@ -105,11 +89,20 @@ function EndMenu({ setPlayState, levelNumber, numberOfScores, playerName, endTim
                 </thead>
                 <tbody className="border-1 border-(--black)">
                     <tr className="bg-(--white)">
-                        <th scope="row" className="p-3 text-center lg:max-xl:p-2">{(isLoading || LeaderboardInfo === null) ? "-" : `#${LeaderboardInfo.playerRank}`}</th>
-                        <td className={`p-3 font-(family-name:--bodoni-400) hyphens-auto wrap-anywhere italic text-left lg:max-xl:p-2 w-[100%] ${LeaderboardInfo && LeaderboardInfo.isPlayerOnLeaderboard && "text-(--light-red)"}`}>{(isLoading || LeaderboardInfo === null) ? playerName : LeaderboardInfo.playerScore.name}</td>
+                        {/* Player rank */}
+                        <th scope="row" className="p-3 text-center lg:max-xl:p-2">
+                            {(isLoading || leaderboardInfo === null) ? "-" : `#${leaderboardInfo.playerRank}`}
+                        </th>
+
+                        {/* Player name */}
+                        <td className={`p-3 font-(family-name:--bodoni-400) hyphens-auto wrap-anywhere italic text-left lg:max-xl:p-2 w-[100%] ${leaderboardInfo && leaderboardInfo.isPlayerOnLeaderboard && "text-(--light-red)"}`}>
+                            {(isLoading || leaderboardInfo === null) ? playerName : leaderboardInfo.playerScore.name}
+                        </td>
                         
-                        {/* Set API/backend time if API call was successful, otherwise display Stopwatch time */}
-                        <td className={`p-3 text-right lg:max-xl:p-2 ${LeaderboardInfo && LeaderboardInfo.isPlayerOnLeaderboard && "text-(--light-red)"}`}>{(isLoading) ? "--" : (LeaderboardInfo === null) ? format(new Date(endTime), timeFormat) : format(new Date(LeaderboardInfo.playerScore.time), timeFormat)}</td>
+                        {/* Player time/score - Set API/backend time if API call was successful, otherwise display Stopwatch time */}
+                        <td className={`p-3 text-right lg:max-xl:p-2 ${leaderboardInfo && leaderboardInfo.isPlayerOnLeaderboard && "text-(--light-red)"}`}>
+                            {(isLoading) ? "--" : (leaderboardInfo === null) ? format(new Date(endTime), timeFormat) : format(new Date(leaderboardInfo.playerScore.time), timeFormat)}
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -120,7 +113,7 @@ function EndMenu({ setPlayState, levelNumber, numberOfScores, playerName, endTim
             <p className="font-bold text-(--gray) loadingScreenText">Grabbing leaderboard...</p>
         </div> 
        :
-        ((error || LeaderboardInfo === null) ?
+        ((leaderboardInfo === null) ?
             <div className="p-3 text-center">
                 <p className="text-3xl lg:max-xl:text-xl xl:max-2xl:text-2xl">⚠️ ✋ 🤔</p>
                 <p>There was an error grabbing the leaderboard.</p>
@@ -137,11 +130,11 @@ function EndMenu({ setPlayState, levelNumber, numberOfScores, playerName, endTim
                         </tr>
                     </thead>
                     <tbody className="border-1 border-(--black)">
-                        {LeaderboardInfo.leaderboardScores.scores.map((score, index) => (
+                        {leaderboardInfo.leaderboardScores.scores.map((score, index) => (
                         <tr key={score.id} className="odd:bg-white even:bg-(--off-white)">
                             <th scope="row" className="p-3 text-center lg:max-xl:p-2">#{index+1}</th>
-                            <td className={`p-3 font-(family-name:--bodoni-400) hyphens-auto wrap-anywhere italic text-left w-[100%] lg:max-xl:p-2 ${score.id === LeaderboardInfo.playerScore.id && "text-(--light-red)"}`}>{score.name}</td>
-                            <td className={`p-3 text-right lg:max-xl:p-2 ${score.id === LeaderboardInfo.playerScore.id && "text-(--light-red)"}`}>{format(new Date(score.time), timeFormat)}</td>
+                            <td className={`p-3 font-(family-name:--bodoni-400) hyphens-auto wrap-anywhere italic text-left w-[100%] lg:max-xl:p-2 ${score.id === leaderboardInfo.playerScore.id && "text-(--light-red)"}`}>{score.name}</td>
+                            <td className={`p-3 text-right lg:max-xl:p-2 ${score.id === leaderboardInfo.playerScore.id && "text-(--light-red)"}`}>{format(new Date(score.time), timeFormat)}</td>
                         </tr>))}
                     </tbody>
                 </table>

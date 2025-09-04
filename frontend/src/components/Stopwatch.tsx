@@ -40,7 +40,7 @@ function Stopwatch({ startTime, endTime, setEndTime, stopwatchStatus, setStopwat
                 
         return () => clearInterval(interval);
       }
-      else if(stopwatchStatus === "off")
+      else if(stopwatchStatus === "off" || stopwatchStatus === "text")
       {
         // Record the end time so it can be shared with other components. This is especially important when the API call to end and record the game fails (meaning we must take the Stopwatch time as the user's final score) or the user reaches the max time
         setEndTime(time);

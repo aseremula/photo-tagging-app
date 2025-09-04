@@ -17,10 +17,10 @@ app.use(session({
   saveUninitialized: false,
   proxy: true,
   name: "eFIND", // cookie name
-  sameSite: 'none', // allow explicit cross-site cookies as the front and back-end are on different sites
-  secure: true, // require cookies to be served over HTTPS and not HTTP - must be true when sameSite is 'none'
-  httpOnly: true, // stop client-side JavaScript access to cookie, which prevents cross-site scripting (XSS) attacks
-  partitioned: true, // for Google CHIPS update, "...cookies from embedded sites will be partitioned and only readable from the same top level site from which it was created"
+  sameSite: process.env.HOST === "web" ? 'none' : 'strict', // allow explicit cross-site cookies as the front and back-end are on different sites
+  secure: process.env.HOST === "web", // require cookies to be served over HTTPS and not HTTP - must be true when sameSite is 'none'
+  httpOnly: process.env.HOST === "web", // stop client-side JavaScript access to cookie, which prevents cross-site scripting (XSS) attacks
+  partitioned: process.env.HOST === "web", // for Google CHIPS update, "...cookies from embedded sites will be partitioned and only readable from the same top level site from which it was created"
 })); // use sessions to store user-specific data like name and leaderboard time
 app.use(express.urlencoded({ extended: true }));
 app.use(

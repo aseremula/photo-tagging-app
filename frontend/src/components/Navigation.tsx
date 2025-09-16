@@ -15,7 +15,7 @@ function Navigation({ imageSet, children } : PropsWithChildren<NavigationCompone
     const listItems = [];
     for (let imageCounter = 1; imageCounter <= levelContext.levelInfo.numberOfImages; imageCounter++) {
       listItems.push(
-        <li key={imageCounter}><ImageIcon key={imageCounter} imagePath={`/${levelContext.levelInfo.img}/${imageCounter}.jpg`} markAsFound={imageSet[imageCounter-1]} /></li>
+        <li key={imageCounter}><ImageIcon key={imageCounter} imagePath={`/${levelContext.levelInfo.img}/${imageCounter}.jpg`} imageNumber={imageCounter} markAsFound={imageSet[imageCounter-1]} /></li>
       );
     }
     return listItems;

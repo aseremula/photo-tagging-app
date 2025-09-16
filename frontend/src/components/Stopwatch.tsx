@@ -13,7 +13,7 @@ type StopwatchComponentProps = {
 function Stopwatch({ startTime, endTime, setEndTime, stopwatchStatus, setStopwatchStatus } : StopwatchComponentProps) {
     const [time, setTime] = useState(0);
     const [isOvertime, setIsOvertime] = useState(false);
-    const MAX_TIME_MILLISECONDS = 3599990; // 59:59.59 time in milliseconds
+    const MAX_TIME_MILLISECONDS = 3599990; // 59:59.99 time in milliseconds
     const timeFormat = "mm:ss.SS";
     
     useEffect(() => {

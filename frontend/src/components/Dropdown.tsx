@@ -91,7 +91,7 @@ function Dropdown({ imageSet, setImageSet, bubbleDirection, setPlayState, setSho
     for (let imageCounter = 1; imageCounter <= levelContext.levelInfo.numberOfImages; imageCounter++) {
       listItems.push(
         <li key={imageCounter} className="flex items-center justify-center">
-          <button type="button" className={`cursor-${(guessedImage.result === "correct" || imageSet[imageCounter-1]) ? "default" : "pointer"} relative ${(guessedImage.imagePosition === 0 || guessedImage.imagePosition === imageCounter || guessedImage.result !== "waiting" || imageSet[imageCounter-1]) ? "opacity-100" : "opacity-50"}`} onMouseEnter={() => (setGuessedImage({...guessedImage, imagePosition: imageCounter as ImagePosition, result: "waiting"}))} onClick={(e) => handleClick(e, imageCounter as ImagePosition)} disabled={(guessedImage.result === "correct" || imageSet[imageCounter-1]) ? true : false} aria-label={`Guess image number ${imageCounter} is located here`}>
+          <button type="button" className={`cursor-${(guessedImage.result === "correct" || imageSet[imageCounter-1]) ? "default" : "pointer"} relative ${(guessedImage.imagePosition === 0 || guessedImage.imagePosition === imageCounter || guessedImage.result !== "waiting" || imageSet[imageCounter-1]) ? "opacity-100" : "opacity-50"}`} onMouseEnter={() => (setGuessedImage({...guessedImage, imagePosition: imageCounter as ImagePosition, result: "waiting"}))} onClick={(e) => handleClick(e, imageCounter as ImagePosition)} disabled={(guessedImage.result === "correct" || imageSet[imageCounter-1]) ? true : false} aria-label={`Guess person ${imageCounter} is located here`}>
             {(guessedImage.imagePosition === imageCounter && guessedImage.result === "correct") && <svg className="svgEnter z-1 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 fill-(--light-red) pointer-events-none lg:max-2xl:w-6 lg:max-2xl:h-6 xl:max-2xl:w-8 xl:max-2xl:h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M382-208 122-468l90-90 170 170 366-366 90 90-456 456Z"/></svg>}
 
             {(guessedImage.imagePosition === imageCounter && guessedImage.result === "incorrect") && <svg className="svgEnter z-1 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 fill-(--light-red) pointer-events-none lg:max-xl:w-6 lg:max-xl:h-6 xl:max-2xl:w-8 xl:max-2xl:h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="m256-168-88-88 224-224-224-224 88-88 224 224 224-224 88 88-224 224 224 224-88 88-224-224-224 224Z"/></svg>}
@@ -103,7 +103,7 @@ function Dropdown({ imageSet, setImageSet, bubbleDirection, setPlayState, setSho
 
             {/* Set opacity and grayscale for the image the user clicked - as long as it's not correct (correct images have their own opacity and grayscale in ImageIcon) or in waiting */}
             <span className={`pointer-events-none ${(guessedImage.imagePosition === imageCounter && guessedImage.result !== "waiting" && guessedImage.result !== "correct") && "grayscale opacity-20"}`}>
-              <ImageIcon key={imageCounter} imagePath={`/${levelContext.levelInfo.img}/${imageCounter}.jpg`} markAsFound={imageSet[imageCounter-1]} />
+              <ImageIcon key={imageCounter} imagePath={`/${levelContext.levelInfo.img}/${imageCounter}.jpg`} imageNumber={imageCounter} markAsFound={imageSet[imageCounter-1]} />
             </span>
           </button>
         </li>

@@ -8,7 +8,7 @@ const { differenceInMilliseconds } = require("date-fns");
 
 type Score = { id: string, name: string, time: number, leaderboardId: number };
 
-const intRangeErr = "must be an integer between greater than 0 and less than 25.";
+const intRangeErr = "must be an integer greater than 0.";
 const intErr = "must be an integer.";
 const doesNotExistErr = "does not exist.";
 const requiredErr = "is required.";
@@ -37,7 +37,7 @@ const validateScore = [
     
     query("numberOfScores").trim().escape()
     .optional({ values: "falsy" })
-    .isInt({gt: 0, lt: 25}).withMessage({category: "numberOfScores", description: `The amount of scores requested ${intRangeErr}`}).bail(),
+    .isInt({gt: 0}).withMessage({category: "numberOfScores", description: `The amount of scores requested ${intRangeErr}`}).bail(),
 ];
 
 // Create and add the player's score to the appropriate leaderboard, then send the updated leaderboard back in response. Entire leaderboard is sent back as default option
@@ -45,15 +45,6 @@ async function leaderboardPost(req: Request, res: Response) {
     const { levelNumber } = req.body;
     const { numberOfScores } = req.query;
 
-    // Get the number of images needed to win the level
-    const answerCount = await prisma.answer.count({
-        where: {
-            level: {
-                levelNumber: parseInt(levelNumber),
-            },
-        },
-    });
-    
     const errors = validationResult(req);
     if(!errors.isEmpty()) 
     {
@@ -67,8 +58,19 @@ async function leaderboardPost(req: Request, res: Response) {
         };
         
         res.status(200).json(invalidData);
+        return;
     }
-    else if(!req.session.correctlyGuessedImages || (req.session.correctlyGuessedImages && (req.session.correctlyGuessedImages.length !== answerCount || req.session.correctlyGuessedImages.includes(false))))
+
+    // Get the number of images needed to win the level
+    const answerCount = await prisma.answer.count({
+        where: {
+            level: {
+                levelNumber: parseInt(levelNumber),
+            },
+        },
+    });
+
+    if(!req.session.correctlyGuessedImages || (req.session.correctlyGuessedImages && (req.session.correctlyGuessedImages.length !== answerCount || req.session.correctlyGuessedImages.includes(false))))
     {
         const incompleteGameData = {
             outcome: outcomes.FAILURE,

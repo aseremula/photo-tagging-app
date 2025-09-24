@@ -18,7 +18,7 @@ app.use(session({
   proxy: true,
   name: "eFIND", // cookie name
   sameSite: process.env.HOST === "web" ? 'none' : 'strict', // allow explicit cross-site cookies as the front and back-end are on different sites
-  secure: process.env.HOST === "web", // require cookies to be served over HTTPS and not HTTP - must be true when sameSite is 'none'
+  secure: process.env.HOST === "web" && process.env.TESTING === "false", // require cookies to be served over HTTPS and not HTTP - must be true when sameSite is 'none'
   httpOnly: process.env.HOST === "web", // stop client-side JavaScript access to cookie, which prevents cross-site scripting (XSS) attacks
   partitioned: process.env.HOST === "web", // for Google CHIPS update, "...cookies from embedded sites will be partitioned and only readable from the same top level site from which it was created"
 })); // use sessions to store user-specific data like name and leaderboard time
@@ -72,8 +72,5 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     },
   });
 });
-  
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}!`);
-});
+
+export default app;

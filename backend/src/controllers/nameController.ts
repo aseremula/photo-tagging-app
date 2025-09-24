@@ -60,6 +60,7 @@ async function namePost(req: Request, res: Response) {
                 isValidName: true,
                 name: name,
                 startTime: getTime(req.session.startTime),
+                errors: [],
             },
         };
 

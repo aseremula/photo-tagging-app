@@ -1,3 +1,4 @@
+import type { Agent } from 'supertest';
 import app from "../app";
 const session = require('supertest-session');
 const async = require('async');
@@ -48,7 +49,8 @@ describe("Leaderboard Routes/Controller", () => {
         const numberOfScores = 3;
         const levelNumber = 1;
 
-        let namedSession:any = null;
+        // supertest-session session variables are just wrappers around supertest agents
+        let namedSession: Agent = testSession;
 
         // In order to test this path, a valid name must have been entered so the game is in play
         beforeEach(async () => {
@@ -61,7 +63,7 @@ describe("Leaderboard Routes/Controller", () => {
                 .post('/names')
                 .send({name: 'Tommy'})
                 .expect(202)
-                .end(function (err:any) {
+                .end(function (err:Error) {
                     if (err) return done(err);
                     namedSession = testSession;
                     return done();
@@ -74,7 +76,7 @@ describe("Leaderboard Routes/Controller", () => {
                 .send({ levelNumber: levelNumber })
                 .set('Accept', 'application/json')
                 .expect('Content-Type', /json/)
-                .expect(function(res:any) {
+                .expect(function(res) {
                     expect(res.body.outcome).toMatch(/failure/i);
                     expect(res.body.description).toMatch(/game is not complete/i);
                     expect(Object.keys(res.body.data).length).toBe(0);
@@ -85,38 +87,38 @@ describe("Leaderboard Routes/Controller", () => {
         it("returns score and leaderboard of set size if game finished and number of scores specified", done => {
             // Run a series of requests: first, make GET requests to guess all image coordinates correctly and finish the game. Then, make a POST request to submit score to leaderboard and return results
             async.series([
-                function(callback:any) { 
+                function(callback:Function) { 
                     namedSession
                     .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[0].coordinateXGuess}&coordinateYGuess=${testImageGuesses[0].coordinateYGuess}&imageNumber=${testImageGuesses[0].imageNumber}`)
                     .expect(200, callback); 
                 },
-                function(callback:any) { 
+                function(callback:Function) { 
                     namedSession
                     .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[1].coordinateXGuess}&coordinateYGuess=${testImageGuesses[1].coordinateYGuess}&imageNumber=${testImageGuesses[1].imageNumber}`)
                     .expect(200, callback); 
                 },
-                function(callback:any) { 
+                function(callback:Function) { 
                     namedSession
                     .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[2].coordinateXGuess}&coordinateYGuess=${testImageGuesses[2].coordinateYGuess}&imageNumber=${testImageGuesses[2].imageNumber}`)
                     .expect(200, callback); 
                 },
-                function(callback:any) { 
+                function(callback:Function) { 
                     namedSession
                     .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[3].coordinateXGuess}&coordinateYGuess=${testImageGuesses[3].coordinateYGuess}&imageNumber=${testImageGuesses[3].imageNumber}`)
                     .expect(200, callback); 
                 },
-                function(callback:any) { 
+                function(callback:Function) { 
                     namedSession
                     .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[4].coordinateXGuess}&coordinateYGuess=${testImageGuesses[4].coordinateYGuess}&imageNumber=${testImageGuesses[4].imageNumber}`)
                     .expect(200, callback); 
                 },
-                function(callback:any) { 
+                function(callback:Function) { 
                     namedSession
                         .post(`/leaderboards?numberOfScores=${numberOfScores}`)
                         .send({ levelNumber: levelNumber })
                         .set('Accept', 'application/json')
                         .expect('Content-Type', /json/)
-                        .expect(function(res:any) {
+                        .expect(function(res) {
                             expect(res.body.outcome).toMatch(/success/i);
 
                             expect(res.body.data.playerScore.name).toBe("Tommy");
@@ -145,38 +147,38 @@ describe("Leaderboard Routes/Controller", () => {
         it("returns score and leaderboard of all scores if game finished and number of scores not specified", done => {
             // Run a series of requests: first, make GET requests to guess all image coordinates correctly and finish the game. Then, make a POST request to submit score to leaderboard and return results
             async.series([
-                function(callback:any) { 
+                function(callback:Function) { 
                     namedSession
                     .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[0].coordinateXGuess}&coordinateYGuess=${testImageGuesses[0].coordinateYGuess}&imageNumber=${testImageGuesses[0].imageNumber}`)
                     .expect(200, callback); 
                 },
-                function(callback:any) { 
+                function(callback:Function) { 
                     namedSession
                     .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[1].coordinateXGuess}&coordinateYGuess=${testImageGuesses[1].coordinateYGuess}&imageNumber=${testImageGuesses[1].imageNumber}`)
                     .expect(200, callback); 
                 },
-                function(callback:any) { 
+                function(callback:Function) { 
                     namedSession
                     .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[2].coordinateXGuess}&coordinateYGuess=${testImageGuesses[2].coordinateYGuess}&imageNumber=${testImageGuesses[2].imageNumber}`)
                     .expect(200, callback); 
                 },
-                function(callback:any) { 
+                function(callback:Function) { 
                     namedSession
                     .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[3].coordinateXGuess}&coordinateYGuess=${testImageGuesses[3].coordinateYGuess}&imageNumber=${testImageGuesses[3].imageNumber}`)
                     .expect(200, callback); 
                 },
-                function(callback:any) { 
+                function(callback:Function) { 
                     namedSession
                     .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[4].coordinateXGuess}&coordinateYGuess=${testImageGuesses[4].coordinateYGuess}&imageNumber=${testImageGuesses[4].imageNumber}`)
                     .expect(200, callback); 
                 },
-                function(callback:any) { 
+                function(callback:Function) { 
                     namedSession
                         .post(`/leaderboards`)
                         .send({ levelNumber: levelNumber })
                         .set('Accept', 'application/json')
                         .expect('Content-Type', /json/)
-                        .expect(function(res:any) {
+                        .expect(function(res) {
                             expect(res.body.outcome).toMatch(/success/i);
 
                             expect(res.body.data.playerScore.name).toBe("Tommy");
@@ -212,27 +214,27 @@ describe("Leaderboard Routes/Controller", () => {
             beforeEach((done) => {
                 // Run a series of GET requests to guess all image coordinates correctly and finish the game
                 async.series([
-                    function(callback:any) { 
+                    function(callback:Function) { 
                         namedSession
                         .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[0].coordinateXGuess}&coordinateYGuess=${testImageGuesses[0].coordinateYGuess}&imageNumber=${testImageGuesses[0].imageNumber}`)
                         .expect(200, callback); 
                     },
-                    function(callback:any) { 
+                    function(callback:Function) { 
                         namedSession
                         .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[1].coordinateXGuess}&coordinateYGuess=${testImageGuesses[1].coordinateYGuess}&imageNumber=${testImageGuesses[1].imageNumber}`)
                         .expect(200, callback); 
                     },
-                    function(callback:any) { 
+                    function(callback:Function) { 
                         namedSession
                         .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[2].coordinateXGuess}&coordinateYGuess=${testImageGuesses[2].coordinateYGuess}&imageNumber=${testImageGuesses[2].imageNumber}`)
                         .expect(200, callback); 
                     },
-                    function(callback:any) { 
+                    function(callback:Function) { 
                         namedSession
                         .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[3].coordinateXGuess}&coordinateYGuess=${testImageGuesses[3].coordinateYGuess}&imageNumber=${testImageGuesses[3].imageNumber}`)
                         .expect(200, callback); 
                     },
-                    function(callback:any) { 
+                    function(callback:Function) { 
                         namedSession
                         .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[4].coordinateXGuess}&coordinateYGuess=${testImageGuesses[4].coordinateYGuess}&imageNumber=${testImageGuesses[4].imageNumber}`)
                         .expect(200, callback); 
@@ -246,7 +248,7 @@ describe("Leaderboard Routes/Controller", () => {
                     .send({})
                     .set('Accept', 'application/json')
                     .expect('Content-Type', /json/)
-                    .expect(function(res:any) {
+                    .expect(function(res) {
                         expect(res.body.outcome).toMatch(/failure/i);
 
                         expect(res.body.data.errors).toBeInstanceOf(Array);
@@ -258,13 +260,13 @@ describe("Leaderboard Routes/Controller", () => {
 
             it("has a level number that is not an integer", done => {
                 async.series([
-                    function(callback:any) { 
+                    function(callback:Function) { 
                         namedSession
                             .post(`/leaderboards?numberOfScores=${numberOfScores}`)
                             .send({ levelNumber: "levelNumber4" })
                             .set('Accept', 'application/json')
                             .expect('Content-Type', /json/)
-                            .expect(function(res:any) {
+                            .expect(function(res) {
                                 expect(res.body.outcome).toMatch(/failure/i);
 
                                 expect(res.body.data.errors).toBeInstanceOf(Array);
@@ -273,13 +275,13 @@ describe("Leaderboard Routes/Controller", () => {
                             })
                         .expect(200, callback); 
                     },
-                    function(callback:any) { 
+                    function(callback:Function) { 
                         namedSession
                             .post(`/leaderboards?numberOfScores=${numberOfScores}`)
                             .send({ levelNumber: 573.34 })
                             .set('Accept', 'application/json')
                             .expect('Content-Type', /json/)
-                            .expect(function(res:any) {
+                            .expect(function(res) {
                                 expect(res.body.outcome).toMatch(/failure/i);
 
                                 expect(res.body.data.errors).toBeInstanceOf(Array);
@@ -288,13 +290,13 @@ describe("Leaderboard Routes/Controller", () => {
                             })
                         .expect(200, callback); 
                     },
-                    function(callback:any) { 
+                    function(callback:Function) { 
                         namedSession
                             .post(`/leaderboards?numberOfScores=${numberOfScores}`)
                             .send({ levelNumber: "&*#*" })
                             .set('Accept', 'application/json')
                             .expect('Content-Type', /json/)
-                            .expect(function(res:any) {
+                            .expect(function(res) {
                                 expect(res.body.outcome).toMatch(/failure/i);
 
                                 expect(res.body.data.errors).toBeInstanceOf(Array);
@@ -308,13 +310,13 @@ describe("Leaderboard Routes/Controller", () => {
 
             it("has the number of scores requested as an integer that is 0 or less", done => {
                 async.series([
-                    function(callback:any) { 
+                    function(callback:Function) { 
                         namedSession
                             .post(`/leaderboards?numberOfScores=${-20}`)
                             .send({ levelNumber: levelNumber })
                             .set('Accept', 'application/json')
                             .expect('Content-Type', /json/)
-                            .expect(function(res:any) {
+                            .expect(function(res) {
                                 expect(res.body.outcome).toMatch(/failure/i);
 
                                 expect(res.body.data.errors).toBeInstanceOf(Array);
@@ -323,13 +325,13 @@ describe("Leaderboard Routes/Controller", () => {
                             })
                         .expect(200, callback); 
                     },
-                    function(callback:any) { 
+                    function(callback:Function) { 
                         namedSession
                             .post(`/leaderboards?numberOfScores=${0}`)
                             .send({ levelNumber: levelNumber })
                             .set('Accept', 'application/json')
                             .expect('Content-Type', /json/)
-                            .expect(function(res:any) {
+                            .expect(function(res) {
                                 expect(res.body.outcome).toMatch(/failure/i);
 
                                 expect(res.body.data.errors).toBeInstanceOf(Array);
@@ -343,13 +345,13 @@ describe("Leaderboard Routes/Controller", () => {
 
             it("has the number of scores requested as a non-integer", done => {
                 async.series([
-                    function(callback:any) { 
+                    function(callback:Function) { 
                         namedSession
                             .post(`/leaderboards?numberOfScores=${"numberofscores"}`)
                             .send({ levelNumber: levelNumber })
                             .set('Accept', 'application/json')
                             .expect('Content-Type', /json/)
-                            .expect(function(res:any) {
+                            .expect(function(res) {
                                 expect(res.body.outcome).toMatch(/failure/i);
 
                                 expect(res.body.data.errors).toBeInstanceOf(Array);
@@ -358,13 +360,13 @@ describe("Leaderboard Routes/Controller", () => {
                             })
                         .expect(200, callback); 
                     },
-                    function(callback:any) { 
+                    function(callback:Function) { 
                         namedSession
                             .post(`/leaderboards?numberOfScores=${"scores=456"}`)
                             .send({ levelNumber: levelNumber })
                             .set('Accept', 'application/json')
                             .expect('Content-Type', /json/)
-                            .expect(function(res:any) {
+                            .expect(function(res) {
                                 expect(res.body.outcome).toMatch(/failure/i);
 
                                 expect(res.body.data.errors).toBeInstanceOf(Array);
@@ -373,13 +375,13 @@ describe("Leaderboard Routes/Controller", () => {
                             })
                         .expect(200, callback); 
                     },
-                    function(callback:any) { 
+                    function(callback:Function) { 
                         namedSession
                             .post(`/leaderboards?numberOfScores=${23.454}`)
                             .send({ levelNumber: levelNumber })
                             .set('Accept', 'application/json')
                             .expect('Content-Type', /json/)
-                            .expect(function(res:any) {
+                            .expect(function(res) {
                                 expect(res.body.outcome).toMatch(/failure/i);
 
                                 expect(res.body.data.errors).toBeInstanceOf(Array);

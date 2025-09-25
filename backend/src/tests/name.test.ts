@@ -72,7 +72,7 @@ describe("Name Routes/Controller", () => {
 
             it("is left empty", done => {
                 async.series([
-                    function(callback:any) {
+                    function(callback:Function) {
                         request(app)
                             .post('/names')
                             .send({name: ''})
@@ -91,7 +91,7 @@ describe("Name Routes/Controller", () => {
                             })
                         .expect(200, done)
                     },
-                    function(callback:any) {
+                    function(callback:Function) {
                         request(app)
                             .post('/names')
                             .send({})

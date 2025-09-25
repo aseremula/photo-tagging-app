@@ -1,3 +1,4 @@
+import type { Agent } from 'supertest';
 import app from "../app";
 const session = require('supertest-session');
 const async = require('async');
@@ -43,7 +44,8 @@ const testImageGuesses = [
 
 describe("Gameboard Routes/Controller", () => {
     describe("GET /gameboards", () => {
-        let namedSession:any = null;
+        // supertest-session session variables are just wrappers around supertest agents
+        let namedSession: Agent = testSession;
 
         // In order to test this path, a valid name must have been entered so the game is in play
         beforeEach((done) => {
@@ -51,7 +53,7 @@ describe("Gameboard Routes/Controller", () => {
                 .post('/names')
                 .send({name: 'Tommy'})
                 .expect(202)
-                .end(function (err:any) {
+                .end(function (err:Error) {
                     if (err) return done(err);
                     namedSession = testSession;
                     return done();
@@ -63,7 +65,7 @@ describe("Gameboard Routes/Controller", () => {
                 .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[1].coordinateXGuess}&coordinateYGuess=${testImageGuesses[1].coordinateYGuess}&imageNumber=${testImageGuesses[0].imageNumber}`)
                 .set('Accept', 'application/json')
                 .expect('Content-Type', /json/)
-                .expect(function(res:any) {
+                .expect(function(res) {
                     expect(res.body.outcome).toMatch(/success/i);
 
                     expect(res.body.data.imageNumber).toMatch(`${testImageGuesses[0].imageNumber}`); // using image 2's coordinates to guess where image 1 is located should result in an incorrect guess
@@ -77,7 +79,7 @@ describe("Gameboard Routes/Controller", () => {
                 .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[1].coordinateXGuess}&coordinateYGuess=${testImageGuesses[1].coordinateYGuess}&imageNumber=${testImageGuesses[1].imageNumber}`)
                 .set('Accept', 'application/json')
                 .expect('Content-Type', /json/)
-                .expect(function(res:any) {
+                .expect(function(res) {
                     expect(res.body.outcome).toMatch(/success/i);
 
                     expect(res.body.data.imageNumber).toMatch(`${testImageGuesses[1].imageNumber}`);
@@ -91,32 +93,32 @@ describe("Gameboard Routes/Controller", () => {
 
         it("notifies when game is complete", done => {
             async.series([
-                function(callback:any) { 
+                function(callback:Function) { 
                     namedSession
                     .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[0].coordinateXGuess}&coordinateYGuess=${testImageGuesses[0].coordinateYGuess}&imageNumber=${testImageGuesses[0].imageNumber}`)
                     .expect(200, callback); 
                 },
-                function(callback:any) { 
+                function(callback:Function) { 
                     namedSession
                     .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[1].coordinateXGuess}&coordinateYGuess=${testImageGuesses[1].coordinateYGuess}&imageNumber=${testImageGuesses[1].imageNumber}`)
                     .expect(200, callback); 
                 },
-                function(callback:any) { 
+                function(callback:Function) { 
                     namedSession
                     .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[2].coordinateXGuess}&coordinateYGuess=${testImageGuesses[2].coordinateYGuess}&imageNumber=${testImageGuesses[2].imageNumber}`)
                     .expect(200, callback); 
                 },
-                function(callback:any) { 
+                function(callback:Function) { 
                     namedSession
                     .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[3].coordinateXGuess}&coordinateYGuess=${testImageGuesses[3].coordinateYGuess}&imageNumber=${testImageGuesses[3].imageNumber}`)
                     .expect(200, callback); 
                 },
-                function(callback:any) { 
+                function(callback:Function) { 
                     namedSession
                     .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[4].coordinateXGuess}&coordinateYGuess=${testImageGuesses[4].coordinateYGuess}&imageNumber=${testImageGuesses[4].imageNumber}`)
                     .set('Accept', 'application/json')
                     .expect('Content-Type', /json/)
-                    .expect(function(res:any) {
+                    .expect(function(res) {
                         expect(res.body.outcome).toMatch(/success/i);
 
                         expect(res.body.data.imageNumber).toMatch(`${testImageGuesses[4].imageNumber}`);
@@ -137,7 +139,7 @@ describe("Gameboard Routes/Controller", () => {
                     .get(`/gameboards/${testGameboardNumber}/guess`)
                     .set('Accept', 'application/json')
                     .expect('Content-Type', /json/)
-                    .expect(function(res:any) {
+                    .expect(function(res) {
                         expect(res.body.outcome).toMatch(/failure/i);
     
                         expect(res.body.data.errors).toBeInstanceOf(Array);
@@ -152,12 +154,12 @@ describe("Gameboard Routes/Controller", () => {
 
             it("has an X or Y coordinate that is not an integer between 0 and 10000", done => {
                 async.series([
-                    function(callback:any) {
+                    function(callback:Function) {
                         namedSession
                             .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${-2323}&coordinateYGuess=${-3727}&imageNumber=${testImageGuesses[0].imageNumber}`)
                             .set('Accept', 'application/json')
                             .expect('Content-Type', /json/)
-                            .expect(function(res:any) {
+                            .expect(function(res) {
                                 expect(res.body.outcome).toMatch(/failure/i);
             
                                 expect(res.body.data.errors).toBeInstanceOf(Array);
@@ -168,12 +170,12 @@ describe("Gameboard Routes/Controller", () => {
                             })
                         .expect(200, callback);
                     },
-                    function(callback:any) {
+                    function(callback:Function) {
                         namedSession
                             .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${2349323}&coordinateYGuess=${3493727}&imageNumber=${testImageGuesses[0].imageNumber}`)
                             .set('Accept', 'application/json')
                             .expect('Content-Type', /json/)
-                            .expect(function(res:any) {
+                            .expect(function(res) {
                                 expect(res.body.outcome).toMatch(/failure/i);
             
                                 expect(res.body.data.errors).toBeInstanceOf(Array);
@@ -184,12 +186,12 @@ describe("Gameboard Routes/Controller", () => {
                             })
                         .expect(200, callback);
                     },
-                    function(callback:any) {
+                    function(callback:Function) {
                         namedSession
                             .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${"notaninteger"}&coordinateYGuess=${"notaninteger"}&imageNumber=${testImageGuesses[0].imageNumber}`)
                             .set('Accept', 'application/json')
                             .expect('Content-Type', /json/)
-                            .expect(function(res:any) {
+                            .expect(function(res) {
                                 expect(res.body.outcome).toMatch(/failure/i);
             
                                 expect(res.body.data.errors).toBeInstanceOf(Array);
@@ -205,12 +207,12 @@ describe("Gameboard Routes/Controller", () => {
 
             it("has an image number that is not an integer", done => {
                 async.series([
-                    function(callback:any) {
+                    function(callback:Function) {
                         namedSession
                             .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[1].coordinateXGuess}&coordinateYGuess=${testImageGuesses[1].coordinateYGuess}&imageNumber=${343.67}`)
                             .set('Accept', 'application/json')
                             .expect('Content-Type', /json/)
-                            .expect(function(res:any) {
+                            .expect(function(res) {
                                 expect(res.body.outcome).toMatch(/failure/i);
             
                                 expect(res.body.data.errors).toBeInstanceOf(Array);
@@ -219,12 +221,12 @@ describe("Gameboard Routes/Controller", () => {
                             })
                         .expect(200, callback);
                     },
-                    function(callback:any) {
+                    function(callback:Function) {
                         namedSession
                             .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[1].coordinateXGuess}&coordinateYGuess=${testImageGuesses[1].coordinateYGuess}&imageNumber=${"imageNumber"}`)
                             .set('Accept', 'application/json')
                             .expect('Content-Type', /json/)
-                            .expect(function(res:any) {
+                            .expect(function(res) {
                                 expect(res.body.outcome).toMatch(/failure/i);
             
                                 expect(res.body.data.errors).toBeInstanceOf(Array);
@@ -233,12 +235,12 @@ describe("Gameboard Routes/Controller", () => {
                             })
                         .expect(200, callback);
                     },
-                    function(callback:any) {
+                    function(callback:Function) {
                         namedSession
                             .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[1].coordinateXGuess}&coordinateYGuess=${testImageGuesses[1].coordinateYGuess}&imageNumber=${"a&*^$"}`)
                             .set('Accept', 'application/json')
                             .expect('Content-Type', /json/)
-                            .expect(function(res:any) {
+                            .expect(function(res) {
                                 expect(res.body.outcome).toMatch(/failure/i);
             
                                 expect(res.body.data.errors).toBeInstanceOf(Array);
@@ -255,7 +257,7 @@ describe("Gameboard Routes/Controller", () => {
                     .get(`/gameboards/${testGameboardNumber}/guess?coordinateXGuess=${testImageGuesses[1].coordinateXGuess}&coordinateYGuess=${testImageGuesses[1].coordinateYGuess}&imageNumber=${343}`)
                     .set('Accept', 'application/json')
                     .expect('Content-Type', /json/)
-                    .expect(function(res:any) {
+                    .expect(function(res) {
                         expect(res.body.outcome).toMatch(/failure/i);
     
                         expect(res.body.data.errors).toBeInstanceOf(Array);
@@ -268,12 +270,12 @@ describe("Gameboard Routes/Controller", () => {
 
             it("has a level number that does not exist", done => { 
                 async.series([
-                    function(callback:any) {
+                    function(callback:Function) {
                         namedSession
                             .get(`/gameboards/${12356}/guess?coordinateXGuess=${testImageGuesses[1].coordinateXGuess}&coordinateYGuess=${testImageGuesses[1].coordinateYGuess}&imageNumber=${testImageGuesses[1].imageNumber}`)
                             .set('Accept', 'application/json')
                             .expect('Content-Type', /json/)
-                            .expect(function(res:any) {
+                            .expect(function(res) {
                                 expect(res.body.outcome).toMatch(/failure/i);
             
                                 expect(res.body.data.errors).toBeInstanceOf(Array);
@@ -282,12 +284,12 @@ describe("Gameboard Routes/Controller", () => {
                             })
                         .expect(200, callback)
                     },
-                    function(callback:any) {
+                    function(callback:Function) {
                         namedSession
                             .get(`/gameboards/`)
                             .set('Accept', 'application/json')
                             .expect('Content-Type', /json/)
-                            .expect(function(res:any) {            
+                            .expect(function(res) {            
                                 expect(res.body.outcome).toMatch(/failure/i);
 
                                 expect(res.body.description).toMatch(/resource you are trying to GET does not exist/i);

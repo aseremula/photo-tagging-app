@@ -1,3 +1,4 @@
+require("dotenv").config();
 import request from "supertest";
 import app from "../app";
 const async = require('async');
@@ -10,6 +11,16 @@ const async = require('async');
 
 describe("Name Routes/Controller", () => {
     describe("POST /names", () => {
+        // Must be using appropriate env variables to test backend
+        beforeEach(async () => {
+            if(process.env.TESTING === "false") {
+                throw new Error("Testing not fully enabled - please switch to testing mode.");
+            }
+            else if(process.env.DATABASE_URL?.includes("test") === false) {
+                throw new Error("Testing not fully enabled - please switch to testing database.");
+            }
+        });
+
         it("accepts name entry if valid", done => {
             request(app)
                 .post('/names')

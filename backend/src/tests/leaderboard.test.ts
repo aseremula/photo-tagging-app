@@ -1,3 +1,4 @@
+require("dotenv").config();
 import type { Agent } from 'supertest';
 import app from "../app";
 const session = require('supertest-session');
@@ -51,13 +52,22 @@ describe("Leaderboard Routes/Controller", () => {
 
         // supertest-session session variables are just wrappers around supertest agents
         let namedSession: Agent = testSession;
-
-        // In order to test this path, a valid name must have been entered so the game is in play
+        
+        // Must be using appropriate env variables to test backend & reset database
         beforeEach(async () => {
-            // Reset database to clear leaderboard stats
-            await loadTestLevels();
+            if(process.env.TESTING === "false") {
+                throw new Error("Testing not fully enabled - please switch to testing mode.");
+            }
+            else if(process.env.DATABASE_URL?.includes("test") === false) {
+                throw new Error("Testing not fully enabled - please switch to testing database.");
+            }
+            else {
+               // Reset database to clear leaderboard stats
+                await loadTestLevels(); 
+            }
         });
 
+        // In order to test this path, a valid name must have been entered so the game is in play
         beforeEach((done) => {
             testSession
                 .post('/names')

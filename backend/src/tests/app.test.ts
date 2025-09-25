@@ -1,3 +1,4 @@
+require("dotenv").config();
 import request from "supertest";
 import app from "../app";
 
@@ -8,6 +9,16 @@ import app from "../app";
 // Add --runInBand option on command so tests are run on a single thread instead of parallel threads, speeding up tests
 
 describe("App", () => {
+    // Must be using appropriate env variables to test backend
+    beforeEach(async () => {
+        if(process.env.TESTING === "false") {
+            throw new Error("Testing not fully enabled - please switch to testing mode.");
+        }
+        else if(process.env.DATABASE_URL?.includes("test") === false) {
+            throw new Error("Testing not fully enabled - please switch to testing database.");
+        }
+    });
+
     it("sends error message if GET path does not exist", done => {
         request(app)
             .get(`/thispathdoesnotwork`)

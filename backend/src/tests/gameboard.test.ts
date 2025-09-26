@@ -44,7 +44,7 @@ const testImageGuesses = [
 ];
 
 describe("Gameboard Routes/Controller", () => {
-    describe("GET /gameboards", () => {
+    describe("GET /gameboards/.../guess", () => {
         // supertest-session session variables are just wrappers around supertest agents
         let namedSession: Agent = testSession;
 

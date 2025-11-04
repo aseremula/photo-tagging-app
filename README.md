@@ -20,6 +20,7 @@ eFIND features a responsive frontend using CSS and TailwindCSS to allow gameplay
 - Vite
 - Vitest
 - React Testing Library (RTL)
+- npm
 - NodeJS
 - Express
 - Prisma ORM

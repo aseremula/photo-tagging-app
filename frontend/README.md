@@ -17,6 +17,7 @@ In addition to the UI being heavily inspired by [eBoy's website](https://www.ebo
 - HTML
 - CSS & TailwindCSS
 - TypeScript
+- npm
 - React
 - Vite
 - Vitest

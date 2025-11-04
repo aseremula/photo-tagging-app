@@ -121,7 +121,7 @@ function StartMenu({ setPlayState, playerName, setPlayerName, setStartTime } : S
             <div className="flex items-center gap-2">
                 <div>
                     <label className="aria-invisible" htmlFor="name">Name</label>
-                    <input key={incorrectSubmitCount} className={`w-[100%] font-(family-name:--roboto-400) text-xl bg-(--off-white) p-3 border-2 rounded-lg ${(formErrors.name !== null) ? "border-(--light-red) inputShake" : "border-(--black)"}  lg:max-xl:text-base xl:max-2xl:text-lg`} autoFocus={true} id="name" type="text" name="name" placeholder="John Doe" value={formData.name} onChange={(e) => {
+                    <input key={incorrectSubmitCount} className={`w-[100%] font-(family-name:--roboto-400) text-xl bg-(--off-white) p-3 border-2 rounded-lg ${(formErrors.name !== null) ? "border-(--light-red) inputShake" : "border-(--black)"}  lg:max-xl:text-base xl:max-2xl:text-lg`} id="name" type="text" name="name" placeholder="John Doe" value={formData.name} onChange={(e) => {
                         setFormData({...formData, name: e.target.value}); 
                     }}/>
                 </div>

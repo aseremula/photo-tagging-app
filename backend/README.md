@@ -17,6 +17,7 @@ Session data/cookies expire when the anonymous user closes eFIND, allowing the b
 - Typescript
 - NodeJS
 - Express
+- npm
 - Prisma ORM
 - PostgreSQL & Neon
 - Jest
